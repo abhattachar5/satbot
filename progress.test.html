@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProgressStore — Test Suite</title>
+<script src="progress.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: #fafaf8;
+    color: #1c1c1e;
+    padding: 2rem;
+    line-height: 1.5;
+  }
+  h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: .5rem; }
+  .subtitle { color: #595f6d; margin-bottom: 2rem; font-size: .9rem; }
+  .summary-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .summary-bar.pass { background: #d1fae5; color: #065f46; }
+  .summary-bar.fail { background: #fee2e2; color: #991b1b; }
+  .suite { margin-bottom: 2rem; }
+  .suite h2 { font-size: 1rem; font-weight: 700; color: #264278; margin-bottom: .75rem; border-bottom: 2px solid #e5e4e0; padding-bottom: .4rem; }
+  .test {
+    display: flex;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .5rem 0;
+    border-bottom: 1px solid #f3f2ef;
+    font-size: .875rem;
+  }
+  .badge {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .7rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .pass-badge { background: #059669; color: #fff; }
+  .fail-badge { background: #dc2626; color: #fff; }
+  .test-name { flex: 1; }
+  .test-detail { color: #dc2626; font-size: .8rem; margin-top: .2rem; font-family: monospace; }
+</style>
+</head>
+<body>
+<h1>ProgressStore — Test Suite</h1>
+<p class="subtitle">Opens in any browser. No server required. All assertions run automatically.</p>
+
+<div id="summary-bar" class="summary-bar">Running…</div>
+
+<div id="results"></div>
+
+<script>
+// ─── Micro test framework ──────────────────────────────────────────────────
+
+const suites  = [];
+let currentSuite = null;
+
+function describe(name, fn) {
+  currentSuite = { name, tests: [] };
+  suites.push(currentSuite);
+  fn();
+}
+
+function it(name, fn) {
+  currentSuite.tests.push({ name, fn });
+}
+
+function assertEqual(actual, expected, msg) {
+  if (actual !== expected) {
+    throw new Error(`${msg || 'assertEqual'}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+  }
+}
+
+function assertDeepEqual(actual, expected, msg) {
+  const a = JSON.stringify(actual);
+  const e = JSON.stringify(expected);
+  if (a !== e) throw new Error(`${msg || 'assertDeepEqual'}:\n  expected ${e}\n  got     ${a}`);
+}
+
+function assertTrue(val, msg) {
+  if (!val) throw new Error(`${msg || 'assertTrue'}: expected truthy, got ${JSON.stringify(val)}`);
+}
+
+function assertFalse(val, msg) {
+  if (val) throw new Error(`${msg || 'assertFalse'}: expected falsy, got ${JSON.stringify(val)}`);
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────
+
+function makeStore(clockDate) {
+  // Always use a fresh isolated key so tests don't bleed into each other.
+  // We monkey-patch _read/_write to use an in-memory object instead of
+  // real localStorage so tests are isolated and fast.
+  const store = new ProgressStore({ _clock: clockDate ? () => clockDate : undefined });
+  let mem = null;
+
+  store._read = function() {
+    if (this._store !== null) return this._store;
+    if (mem === null) { this._store = (typeof emptyStore === 'function') ? emptyStore() : null; }
+    else {
+      try {
+        const parsed = JSON.parse(mem);
+        if (parsed.schemaVersion !== 1) throw new Error('version mismatch');
+        this._store = parsed;
+      } catch(e) {
+        this._corruptionDetected = true;
+        this._store = { schemaVersion:1, deviceId:'test', createdAt: new Date().toISOString(), preferences:{displayName:null,yearGroup:'Y6',weeklyGoalPapers:3}, attempts:[], sessions:[], goals:[], achievements:[] };
+      }
+    }
+    return this._store;
+  };
+
+  store._write = function() { mem = JSON.stringify(this._store); };
+
+  // Override resetAll to also clear the in-memory backing store
+  store.resetAll = async function() { mem = null; this._store = null; this._corruptionDetected = false; return Promise.resolve(); };
+
+  // Helper to inject bad data
+  store._corruptMemory = function() { mem = '{not valid json{{'; this._store = null; };
+
+  return store;
+}
+
+// Use the internal emptyStore via reflection (it's module-scoped, so we
+// recreate a small version here for the test framework).
+function emptyStore() {
+  return {
+    schemaVersion: 1,
+    deviceId: 'test-device',
+    createdAt: new Date().toISOString(),
+    preferences: { displayName: null, yearGroup: 'Y6', weeklyGoalPapers: 3 },
+    attempts: [], sessions: [], goals: [], achievements: []
+  };
+}
+
+function sampleAttempt(overrides = {}) {
+  return {
+    paperCode:       overrides.paperCode       || 'maths-2023-paper1',
+    subject:         overrides.subject         || 'maths',
+    score:           overrides.score           ?? 30,
+    maxScore:        overrides.maxScore        ?? 40,
+    startedAt:       overrides.startedAt       || new Date().toISOString(),
+    completedAt:     overrides.completedAt     || new Date().toISOString(),
+    durationSeconds: overrides.durationSeconds || 1200,
+    questionResults: overrides.questionResults || [
+      { qId: 'q1', topic: 'fractions', correct: true,  timeSeconds: 30 },
+      { qId: 'q2', topic: 'fractions', correct: false, timeSeconds: 45 },
+      { qId: 'q3', topic: 'algebra',   correct: true,  timeSeconds: 20 }
+    ],
+    retryOf: overrides.retryOf || null,
+    ...overrides
+  };
+}
+
+// ─── Tests ────────────────────────────────────────────────────────────────
+
+describe('Empty-store reads', () => {
+  it('hasData() returns false on fresh store', async () => {
+    const s = makeStore();
+    assertFalse(await s.hasData(), 'hasData');
+  });
+
+  it('getAllAttempts() returns empty array', async () => {
+    const s = makeStore();
+    assertDeepEqual(await s.getAllAttempts(), [], 'getAllAttempts');
+  });
+
+  it('getSummary() returns null averagePercent and zero counts', async () => {
+    const s = makeStore();
+    const sum = await s.getSummary();
+    assertEqual(sum.totalAttempts, 0, 'totalAttempts');
+    assertEqual(sum.overallAveragePercent, null, 'overallAveragePercent');
+    assertEqual(sum.currentStreakDays, 0, 'currentStreakDays');
+    assertEqual(sum.lastAttemptAt, null, 'lastAttemptAt');
+  });
+
+  it('getTopicMastery() returns empty array', async () => {
+    const s = makeStore();
+    assertDeepEqual(await s.getTopicMastery(), [], 'getTopicMastery');
+  });
+
+  it('getEarnedAchievements() returns empty array', async () => {
+    const s = makeStore();
+    assertDeepEqual(await s.getEarnedAchievements(), [], 'getEarnedAchievements');
+  });
+
+  it('getSubjectBreakdown() returns three subjects with zero counts', async () => {
+    const s = makeStore();
+    const breakdown = await s.getSubjectBreakdown();
+    assertEqual(breakdown.length, 3, 'three subjects');
+    assertTrue(breakdown.every(b => b.attemptCount === 0), 'all zero attemptCount');
+    assertTrue(breakdown.every(b => b.trend === 'insufficient_data'), 'all insufficient_data');
+  });
+
+  it('getActiveGoals() returns empty array', async () => {
+    const s = makeStore();
+    assertDeepEqual(await s.getActiveGoals(), [], 'getActiveGoals');
+  });
+
+  it('wasCorruptionDetected() returns false', async () => {
+    const s = makeStore();
+    assertFalse(await s.wasCorruptionDetected(), 'corruption');
+  });
+});
+
+describe('recordAttempt round-trip', () => {
+  it('generates an id and stores the attempt', async () => {
+    const s   = makeStore();
+    const att = await s.recordAttempt(sampleAttempt());
+    assertTrue(att.id.startsWith('att_'), 'id prefix');
+    const all = await s.getAllAttempts();
+    assertEqual(all.length, 1, 'one attempt');
+    assertEqual(all[0].id, att.id, 'id matches');
+  });
+
+  it('hasData() returns true after recording', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt());
+    assertTrue(await s.hasData(), 'hasData');
+  });
+
+  it('stores all provided fields correctly', async () => {
+    const s   = makeStore();
+    const input = sampleAttempt({ score: 38, maxScore: 40, paperCode: 'reading-2022-paper2', subject: 'reading' });
+    const saved = await s.recordAttempt(input);
+    assertEqual(saved.score,     38,                   'score');
+    assertEqual(saved.maxScore,  40,                   'maxScore');
+    assertEqual(saved.paperCode, 'reading-2022-paper2','paperCode');
+    assertEqual(saved.subject,   'reading',            'subject');
+  });
+
+  it('getSummary() reflects recorded attempt', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({ score: 30, maxScore: 40 }));
+    const sum = await s.getSummary();
+    assertEqual(sum.totalAttempts, 1, 'totalAttempts');
+    assertEqual(sum.overallAveragePercent, 75, 'averagePercent');
+  });
+
+  it('getRecentAttempts(limit) honours the limit', async () => {
+    const s = makeStore();
+    for (let i = 0; i < 5; i++) await s.recordAttempt(sampleAttempt({ paperCode: `paper-${i}` }));
+    const recent = await s.getRecentAttempts(3);
+    assertEqual(recent.length, 3, 'limit respected');
+  });
+
+  it('getAttemptsBySubject() filters correctly', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({ subject: 'maths' }));
+    await s.recordAttempt(sampleAttempt({ subject: 'reading' }));
+    await s.recordAttempt(sampleAttempt({ subject: 'maths' }));
+    const maths = await s.getAttemptsBySubject('maths');
+    assertEqual(maths.length, 2, 'maths count');
+    assertTrue(maths.every(a => a.subject === 'maths'), 'all maths');
+  });
+});
+
+describe('Streak calculation', () => {
+  // We inject a fixed clock and build completedAt timestamps manually.
+
+  function dayISO(daysAgo, now) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - daysAgo);
+    d.setHours(10, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  it('streak of 1 when only today has an attempt', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(0, now) }));
+    const sum = await s.getSummary();
+    assertEqual(sum.currentStreakDays, 1, 'currentStreakDays');
+    assertEqual(sum.longestStreakDays, 1, 'longestStreakDays');
+  });
+
+  it('streak of 3 for three consecutive days ending today', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(0, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(1, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(2, now) }));
+    const sum = await s.getSummary();
+    assertEqual(sum.currentStreakDays, 3, 'currentStreakDays');
+    assertEqual(sum.longestStreakDays, 3, 'longestStreakDays');
+  });
+
+  it('streak counts yesterday as valid end day', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(1, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(2, now) }));
+    const sum = await s.getSummary();
+    assertEqual(sum.currentStreakDays, 2, 'currentStreakDays');
+  });
+
+  it('streak breaks on a gap', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(0, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(1, now) }));
+    // gap on day 2
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(3, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(4, now) }));
+    const sum = await s.getSummary();
+    assertEqual(sum.currentStreakDays, 2, 'currentStreakDays after gap');
+    assertEqual(sum.longestStreakDays, 2, 'longestStreakDays');
+  });
+
+  it('longest streak persisted even when current streak reset', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    // 5-day streak last week, then a 3-day gap, then today only
+    for (let i = 5; i <= 9; i++) await s.recordAttempt(sampleAttempt({ completedAt: dayISO(i, now) }));
+    await s.recordAttempt(sampleAttempt({ completedAt: dayISO(0, now) }));
+    const sum = await s.getSummary();
+    assertEqual(sum.longestStreakDays, 5, 'longestStreakDays');
+    assertEqual(sum.currentStreakDays, 1, 'currentStreakDays');
+  });
+});
+
+describe('Topic mastery aggregation', () => {
+  it('computes accuracy correctly across mixed correctness', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({
+      subject: 'maths',
+      questionResults: [
+        { qId: 'q1', topic: 'fractions', correct: true,  timeSeconds: 10 },
+        { qId: 'q2', topic: 'fractions', correct: true,  timeSeconds: 10 },
+        { qId: 'q3', topic: 'fractions', correct: false, timeSeconds: 10 },
+        { qId: 'q4', topic: 'fractions', correct: false, timeSeconds: 10 },
+        { qId: 'q5', topic: 'algebra',   correct: true,  timeSeconds: 10 },
+      ]
+    }));
+    const mastery = await s.getTopicMastery();
+    const frac  = mastery.find(t => t.topic === 'fractions');
+    const alg   = mastery.find(t => t.topic === 'algebra');
+    assertEqual(frac.accuracyPercent, 50,  'fractions 50%');
+    assertEqual(frac.band,            'needs_practice', 'fractions band');
+    assertEqual(alg.accuracyPercent,  100, 'algebra 100%');
+    assertEqual(alg.band,             'mastered', 'algebra band');
+  });
+
+  it('sorts weakest topic first', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({
+      questionResults: [
+        { qId: 'q1', topic: 'hard',  correct: false, timeSeconds: 5 },
+        { qId: 'q2', topic: 'easy',  correct: true,  timeSeconds: 5 },
+        { qId: 'q3', topic: 'easy',  correct: true,  timeSeconds: 5 },
+      ]
+    }));
+    const mastery = await s.getTopicMastery();
+    assertEqual(mastery[0].topic, 'hard', 'weakest first');
+  });
+
+  it('aggregates across multiple attempts for same topic', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({
+      questionResults: [{ qId:'q1', topic:'fractions', correct:true, timeSeconds:5 }]
+    }));
+    await s.recordAttempt(sampleAttempt({
+      questionResults: [{ qId:'q2', topic:'fractions', correct:false, timeSeconds:5 }]
+    }));
+    const mastery = await s.getTopicMastery();
+    const frac = mastery.find(t => t.topic === 'fractions');
+    assertEqual(frac.questionCount, 2, 'questionCount');
+    assertEqual(frac.correctCount,  1, 'correctCount');
+    assertEqual(frac.accuracyPercent, 50, 'accuracy');
+  });
+});
+
+describe('Achievement awarding', () => {
+  it('first_paper awarded after one attempt', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt());
+    const newlyEarned = await s.evaluateAchievements();
+    assertTrue(newlyEarned.some(a => a.code === 'first_paper'), 'first_paper awarded');
+  });
+
+  it('achievements awarded at most once', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt());
+    await s.evaluateAchievements();
+    const second = await s.evaluateAchievements();
+    assertFalse(second.some(a => a.code === 'first_paper'), 'not awarded twice');
+  });
+
+  it('five_papers awarded at 5 attempts', async () => {
+    const s = makeStore();
+    for (let i = 0; i < 5; i++) await s.recordAttempt(sampleAttempt({ paperCode: `p-${i}` }));
+    const earned = await s.evaluateAchievements();
+    assertTrue(earned.some(a => a.code === 'five_papers'), 'five_papers awarded');
+  });
+
+  it('ten_papers awarded for 10 distinct paper codes', async () => {
+    const s = makeStore();
+    for (let i = 0; i < 10; i++) await s.recordAttempt(sampleAttempt({ paperCode: `distinct-${i}` }));
+    const earned = await s.evaluateAchievements();
+    assertTrue(earned.some(a => a.code === 'ten_papers'), 'ten_papers');
+  });
+
+  it('first_full_marks awarded when score === maxScore', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({ score: 40, maxScore: 40 }));
+    const earned = await s.evaluateAchievements();
+    assertTrue(earned.some(a => a.code === 'first_full_marks'), 'first_full_marks');
+  });
+
+  it('three_streak awarded after 3-day streak', async () => {
+    const now = new Date('2024-06-15T12:00:00');
+    const s   = makeStore(now);
+    for (let i = 0; i < 3; i++) {
+      const d = new Date(now); d.setDate(d.getDate() - i); d.setHours(10);
+      await s.recordAttempt(sampleAttempt({ completedAt: d.toISOString() }));
+    }
+    const earned = await s.evaluateAchievements();
+    assertTrue(earned.some(a => a.code === 'three_streak'), 'three_streak');
+  });
+
+  it('improver awarded when last 3 beat prior 3 in same subject', async () => {
+    const s = makeStore();
+    const make = (score, i) => sampleAttempt({
+      subject: 'maths', score, maxScore: 100, paperCode: `p-${i}`,
+      completedAt: new Date(Date.now() + i * 86400000).toISOString()
+    });
+    // Prior 3: 50, 55, 60. Last 3: 80, 85, 90.
+    await s.recordAttempt(make(50, 0));
+    await s.recordAttempt(make(55, 1));
+    await s.recordAttempt(make(60, 2));
+    await s.recordAttempt(make(80, 3));
+    await s.recordAttempt(make(85, 4));
+    await s.recordAttempt(make(90, 5));
+    const earned = await s.evaluateAchievements();
+    assertTrue(earned.some(a => a.code === 'improver'), 'improver');
+  });
+});
+
+describe('Corruption detection', () => {
+  it('wasCorruptionDetected() returns true after corrupt data', async () => {
+    const s = makeStore();
+    s._corruptMemory();
+    assertTrue(await s.wasCorruptionDetected(), 'corruption detected');
+  });
+
+  it('store resets to empty after corruption, not crash', async () => {
+    const s = makeStore();
+    s._corruptMemory();
+    await s.wasCorruptionDetected(); // triggers read
+    const all = await s.getAllAttempts();
+    assertDeepEqual(all, [], 'empty after corruption');
+  });
+
+  it('can write new data after corruption recovery', async () => {
+    const s = makeStore();
+    s._corruptMemory();
+    await s.wasCorruptionDetected();
+    await s.recordAttempt(sampleAttempt());
+    const all = await s.getAllAttempts();
+    assertEqual(all.length, 1, 'one attempt after recovery');
+  });
+});
+
+describe('exportAll → resetAll → importAll round-trip', () => {
+  it('importAll restores all attempts losslessly', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({ score: 35, maxScore: 40, paperCode: 'unique-paper' }));
+    await s.recordAttempt(sampleAttempt({ subject: 'reading', score: 28, maxScore: 35 }));
+    await s.evaluateAchievements();
+
+    const exported = await s.exportAll();
+    await s.resetAll();
+
+    const empty = await s.getAllAttempts();
+    assertDeepEqual(empty, [], 'empty after reset');
+
+    const result = await s.importAll(exported);
+    assertTrue(result.success, 'import success');
+    assertDeepEqual(result.errors, [], 'no errors');
+
+    const restored = await s.getAllAttempts();
+    assertEqual(restored.length, 2, 'both attempts restored');
+    const restoredCodes = restored.map(a => a.paperCode).sort();
+    const exportedCodes = exported.attempts.map(a => a.paperCode).sort();
+    assertDeepEqual(restoredCodes, exportedCodes, 'paperCodes match');
+  });
+
+  it('importAll rejects data with wrong schema version', async () => {
+    const s = makeStore();
+    const result = await s.importAll({ schemaVersion: 99, attempts: [], goals: [], achievements: [], preferences: {} });
+    assertFalse(result.success, 'import rejected');
+    assertTrue(result.errors.length > 0, 'has errors');
+  });
+
+  it('exportAll produces a deep copy not a reference', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt());
+    const exported = await s.exportAll();
+    exported.attempts[0].score = 9999;
+    const fresh = await s.getAllAttempts();
+    assertTrue(fresh[0].score !== 9999, 'mutation did not affect store');
+  });
+});
+
+describe('Goals', () => {
+  it('createGoal persists and getActiveGoals returns it', async () => {
+    const s = makeStore();
+    const goal = await s.createGoal({ subject: 'maths', targetPercent: 80, deadline: '2025-07-01T00:00:00.000Z' });
+    assertTrue(goal.id.startsWith('goal_'), 'id prefix');
+    const active = await s.getActiveGoals();
+    assertEqual(active.length, 1, 'one active goal');
+    assertEqual(active[0].subject, 'maths', 'subject matches');
+  });
+
+  it('deleteGoal removes the goal', async () => {
+    const s    = makeStore();
+    const goal = await s.createGoal({ subject: 'reading', targetPercent: 75, deadline: '2025-07-01T00:00:00.000Z' });
+    await s.deleteGoal(goal.id);
+    const active = await s.getActiveGoals();
+    assertDeepEqual(active, [], 'no goals');
+  });
+
+  it('getGoalProgress returns currentPercent based on attempts', async () => {
+    const s    = makeStore();
+    const goal = await s.createGoal({ subject: 'maths', targetPercent: 80, deadline: '2027-01-01T00:00:00.000Z' });
+    await s.recordAttempt(sampleAttempt({ subject: 'maths', score: 40, maxScore: 50 })); // 80%
+    const progress = await s.getGoalProgress(goal.id);
+    assertEqual(progress.currentPercent, 80, 'currentPercent');
+  });
+});
+
+describe('Preferences', () => {
+  it('getPreferences returns defaults', async () => {
+    const s    = makeStore();
+    const prefs = await s.getPreferences();
+    assertEqual(prefs.displayName,      null, 'displayName');
+    assertEqual(prefs.yearGroup,        'Y6', 'yearGroup');
+    assertEqual(prefs.weeklyGoalPapers, 3,    'weeklyGoalPapers');
+  });
+
+  it('updatePreferences merges partial changes', async () => {
+    const s     = makeStore();
+    const prefs = await s.updatePreferences({ displayName: 'Alex' });
+    assertEqual(prefs.displayName,      'Alex', 'displayName updated');
+    assertEqual(prefs.yearGroup,        'Y6',   'yearGroup unchanged');
+    assertEqual(prefs.weeklyGoalPapers, 3,      'weeklyGoalPapers unchanged');
+  });
+});
+
+// ─── Runner ───────────────────────────────────────────────────────────────
+
+async function runAll() {
+  const container = document.getElementById('results');
+  let totalPass = 0, totalFail = 0;
+
+  for (const suite of suites) {
+    const suiteEl = document.createElement('div');
+    suiteEl.className = 'suite';
+    suiteEl.innerHTML = `<h2>${suite.name}</h2>`;
+
+    for (const test of suite.tests) {
+      const testEl = document.createElement('div');
+      testEl.className = 'test';
+      try {
+        await test.fn();
+        testEl.innerHTML = `
+          <span class="badge pass-badge" aria-hidden="true">✓</span>
+          <span class="test-name">${test.name}</span>`;
+        totalPass++;
+      } catch(e) {
+        testEl.innerHTML = `
+          <span class="badge fail-badge" aria-hidden="true">✗</span>
+          <div>
+            <span class="test-name">${test.name}</span>
+            <div class="test-detail">${e.message}</div>
+          </div>`;
+        totalFail++;
+        console.error(`FAIL [${suite.name}] ${test.name}:`, e);
+      }
+      suiteEl.appendChild(testEl);
+    }
+    container.appendChild(suiteEl);
+  }
+
+  const bar = document.getElementById('summary-bar');
+  if (totalFail === 0) {
+    bar.className = 'summary-bar pass';
+    bar.textContent = `✓ All ${totalPass} tests passed`;
+  } else {
+    bar.className = 'summary-bar fail';
+    bar.textContent = `✗ ${totalFail} test${totalFail > 1 ? 's' : ''} failed, ${totalPass} passed`;
+  }
+}
+
+window.addEventListener('DOMContentLoaded', runAll);
+</script>
+</body>
+</html>

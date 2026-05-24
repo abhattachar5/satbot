@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Progress | Free UK Year 6 SATS Practice Papers</title>
+<meta name="description" content="Track your Year 6 SATs practice — scores, streaks, topic mastery and more.">
+<link rel="canonical" href="https://satbot.co.uk/progress.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="My Progress | SATBot">
+<meta property="og:description" content="Track your Year 6 SATs practice progress, streaks, topic mastery and badges.">
+<meta property="og:url" content="https://satbot.co.uk/progress.html">
+<meta property="og:site_name" content="SATBot">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Source+Serif+4:wght@400;600&display=swap" rel="stylesheet">
+<!-- Chart.js — the one permitted external dependency -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="progress.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1a2e5a;
+    --navy-mid:#264278;
+    --amber:   #f59e0b;
+    --amber-lt:#fef3c7;
+    --green:   #059669;
+    --green-lt:#d1fae5;
+    --red:     #dc2626;
+    --red-lt:  #fee2e2;
+    --bg:      #fafaf8;
+    --bg2:     #f3f2ef;
+    --text:    #1c1c1e;
+    --muted:   #595f6d;
+    --border:  #e5e4e0;
+    --radius:  12px;
+    --shadow:  0 2px 12px rgba(26,46,90,.08);
+    --blue:    #2563eb;
+    --blue-lt: #eff6ff;
+    --purple:  #7c3aed;
+    --purple-lt:#ede9fe;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* NAV — identical to index.html */
+  nav {
+    background: var(--navy);
+    padding: 0 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    min-height: 56px;
+    flex-wrap: wrap;
+  }
+  .nav-logo {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    letter-spacing: -.5px;
+  }
+  .nav-logo span { color: var(--amber); }
+  nav a.nav-link {
+    color: rgba(255,255,255,.7);
+    text-decoration: none;
+    font-size: .9rem;
+    font-weight: 500;
+    transition: color .15s;
+  }
+  nav a.nav-link:hover, nav a.nav-link[aria-current="page"] { color: #fff; }
+  .nav-spacer { flex: 1; }
+
+  /* HERO — matches the full-width hero pattern from index.html */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+    color: #fff;
+    padding: 4rem 2rem 0;
+    text-align: center;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    background: rgba(255,255,255,.12);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 100px;
+    padding: .3rem 1rem;
+    font-size: .8rem;
+    font-weight: 500;
+    margin-bottom: 1.5rem;
+    letter-spacing: .03em;
+  }
+  .hero h1 {
+    font-size: clamp(2.2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -.03em;
+    margin-bottom: 1rem;
+  }
+  .hero h1 em { color: var(--amber); font-style: normal; }
+  .hero p {
+    font-size: 1.15rem;
+    color: rgba(255,255,255,.8);
+    max-width: 540px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+  .hero-achievement-callout {
+    display: inline-flex;
+    align-items: center;
+    gap: .6rem;
+    background: rgba(245,158,11,.15);
+    border: 1px solid rgba(245,158,11,.3);
+    border-radius: 100px;
+    padding: .4rem 1.2rem;
+    font-size: .85rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+  }
+
+  /* STAT STRIP — matches the stats bar pattern from index.html */
+  .stats {
+    background: var(--navy);
+    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    flex-wrap: wrap;
+  }
+  .stat-item {
+    padding: 1rem 2.5rem;
+    text-align: center;
+    border-right: 1px solid rgba(255,255,255,.08);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-size: 1.5rem; font-weight: 700; color: var(--amber); }
+  .stat-lbl { font-size: .75rem; color: rgba(255,255,255,.6); margin-top: .1rem; }
+
+  /* MAIN CONTENT — matches index.html pattern */
+  .main { max-width: 1060px; margin: 0 auto; padding: 4rem 2rem; }
+
+  .section-label {
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: var(--navy);
+    margin-bottom: .5rem;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: .95rem;
+    margin-bottom: 2.5rem;
+    max-width: 520px;
+    line-height: 1.55;
+  }
+
+  /* CARDS — matches the subject-card pattern from index.html */
+  .card {
+    background: #fff;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    border-color: var(--navy);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(26,46,90,.13);
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .card-blue::before   { background: var(--blue); }
+  .card-green::before  { background: var(--green); }
+  .card-purple::before { background: var(--purple); }
+  .card-amber::before  { background: var(--amber); }
+
+  .card-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 1.25rem;
+  }
+  .icon-blue   { background: var(--blue-lt); }
+  .icon-green  { background: var(--green-lt); }
+  .icon-purple { background: var(--purple-lt); }
+
+  .card-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: .35rem;
+    letter-spacing: -.02em;
+  }
+  .card-desc {
+    font-size: .875rem;
+    color: var(--muted);
+    line-height: 1.55;
+    margin-bottom: 1.5rem;
+  }
+  .card-meta {
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+
+  /* CHIPS — matches index.html chip pattern */
+  .chip {
+    font-size: .75rem;
+    font-weight: 500;
+    padding: .2rem .65rem;
+    border-radius: 100px;
+    background: var(--bg2);
+    color: var(--muted);
+  }
+  .chip-blue   { background: var(--blue-lt);   color: var(--blue); }
+  .chip-green  { background: var(--green-lt);  color: var(--green); }
+  .chip-purple { background: var(--purple-lt); color: var(--purple); }
+  .chip-amber  { background: var(--amber-lt);  color: #92400e; }
+  .chip-red    { background: var(--red-lt);    color: var(--red); }
+
+  /* BUTTONS — matches index.html button styles exactly */
+  .btn-primary {
+    background: var(--amber);
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    padding: .75rem 1.75rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, transform .1s;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+  }
+  .btn-primary:hover { background: #fbbf24; transform: translateY(-1px); }
+  .btn-card-primary {
+    background: var(--navy);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    padding: .6rem 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+  }
+  .btn-card-primary:hover { background: var(--navy-mid); }
+  .btn-card-secondary {
+    background: transparent;
+    color: var(--navy);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    padding: .6rem 1rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: border-color .15s, background .15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .4rem;
+  }
+  .btn-card-secondary:hover { border-color: var(--navy); background: var(--bg2); }
+
+  /* SUBJECT GRID */
+  .subject-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  /* CHART SECTION */
+  .chart-card { padding: 2rem; margin-bottom: 4rem; }
+  .chart-wrap { position: relative; height: 280px; }
+  .chart-empty {
+    text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: .95rem; line-height: 1.6;
+  }
+  .chart-empty strong { display: block; font-size: 1rem; color: var(--text); margin-bottom: .4rem; }
+  .chart-table-toggle {
+    background: none; border: 1.5px solid var(--border); border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-size: .8rem; font-weight: 600; color: var(--muted);
+    padding: .35rem .85rem; cursor: pointer; transition: border-color .15s;
+  }
+  .chart-table-toggle:hover { border-color: var(--navy); color: var(--navy); }
+  .chart-data-table { display: none; margin-top: 1.5rem; width: 100%; border-collapse: collapse; font-size: .85rem; }
+  .chart-data-table th { text-align: left; padding: .5rem; background: var(--bg2); font-weight: 600; border-radius: 4px; }
+  .chart-data-table td { padding: .5rem; border-top: 1px solid var(--border); }
+  .chart-data-table.visible { display: table; }
+
+  /* TOPIC MASTERY BARS */
+  .mastery-row {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .65rem 0; border-bottom: 1px solid var(--bg2);
+  }
+  .mastery-row:last-child { border-bottom: none; }
+  .mastery-label { font-size: .875rem; font-weight: 500; min-width: 130px; flex-shrink: 0; }
+  .mastery-bar-wrap { flex: 1; background: var(--bg2); border-radius: 100px; height: 14px; overflow: hidden; }
+  .mastery-bar { height: 100%; border-radius: 100px; min-width: 2px; transition: width .4s ease; }
+  .mastery-bar.needs_practice { background: #ef4444; }
+  .mastery-bar.getting_there  { background: var(--amber); }
+  .mastery-bar.mastered       { background: var(--green); }
+  .mastery-pct { font-size: .8rem; font-weight: 700; min-width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* RECENT ACTIVITY SCROLL */
+  .activity-scroll { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: .5rem; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .activity-scroll::-webkit-scrollbar { height: 6px; }
+  .activity-scroll::-webkit-scrollbar-track { background: var(--bg2); border-radius: 10px; }
+  .activity-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  .activity-card {
+    flex-shrink: 0; width: 210px; scroll-snap-align: start;
+    background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 1.25rem; box-shadow: var(--shadow); transition: border-color .15s, transform .15s;
+  }
+  .activity-card:hover { border-color: var(--navy); transform: translateY(-2px); }
+  .activity-card-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .65rem; }
+  .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .activity-paper { font-size: .82rem; font-weight: 600; color: var(--navy); line-height: 1.3; }
+  .activity-score { font-size: 1.4rem; font-weight: 700; color: var(--navy); letter-spacing: -.02em; margin-bottom: .1rem; }
+  .activity-pct { font-size: .8rem; color: var(--muted); margin-bottom: .5rem; }
+  .activity-meta { font-size: .75rem; color: var(--muted); }
+
+  /* GOALS */
+  .goals-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .goal-card {
+    background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 1.5rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1.25rem;
+  }
+  .goal-ring-wrap { flex-shrink: 0; width: 72px; height: 72px; }
+  .goal-ring-wrap svg { width: 72px; height: 72px; }
+  .goal-ring-bg   { fill: none; stroke: var(--bg2); stroke-width: 4; }
+  .goal-ring-fill { fill: none; stroke-width: 4; stroke-linecap: round; transform-origin: center; transform: rotate(-90deg); transition: stroke-dasharray .5s ease; }
+  .goal-ring-fill.on-track { stroke: var(--green); }
+  .goal-ring-fill.at-risk  { stroke: var(--amber); }
+  .goal-ring-text { font-size: .9rem; font-weight: 700; fill: var(--navy); dominant-baseline: middle; text-anchor: middle; }
+  .goal-info { flex: 1; min-width: 0; }
+  .goal-title { font-weight: 700; font-size: .95rem; color: var(--navy); margin-bottom: .25rem; }
+  .goal-deadline { font-size: .78rem; color: var(--muted); }
+  .goal-delete { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 1rem; padding: .25rem; margin-top: .3rem; transition: color .15s; }
+  .goal-delete:hover { color: var(--red); }
+
+  .goal-form-card {
+    background: #fff; border: 1.5px dashed var(--border); border-radius: var(--radius);
+    padding: 1.5rem; text-align: center; margin-bottom: 1.5rem;
+  }
+  .goal-form-card p { color: var(--muted); font-size: .9rem; margin-bottom: 1rem; }
+  .goal-form { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; }
+  .goal-form select, .goal-form input {
+    border: 1.5px solid var(--border); border-radius: 8px; padding: .5rem .75rem;
+    font-family: 'DM Sans', sans-serif; font-size: .875rem; color: var(--text); background: #fff;
+  }
+  .goal-form select:focus, .goal-form input:focus { outline: 2px solid var(--navy); border-color: var(--navy); }
+
+  /* NEXT ACHIEVEMENT */
+  .next-achievement-card {
+    background: #fff; border: 1.5px solid var(--border); border-radius: var(--radius);
+    padding: 1.5rem; box-shadow: var(--shadow); margin-bottom: 4rem;
+  }
+  .next-ach-title { font-size: .75rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: .6rem; }
+  .next-ach-name  { font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: .5rem; }
+  .ach-bar-wrap { background: var(--bg2); border-radius: 100px; height: 12px; overflow: hidden; margin-bottom: .5rem; }
+  .ach-bar      { height: 100%; background: var(--amber); border-radius: 100px; transition: width .4s ease; }
+  .next-ach-hint { font-size: .82rem; color: var(--muted); }
+
+  /* UTILITIES */
+  .utilities {
+    border-top: 1.5px solid var(--border);
+    padding-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .util-privacy { font-size: .78rem; color: var(--muted); margin-left: auto; }
+  .util-privacy a { color: var(--navy); font-weight: 600; text-decoration: none; }
+  .util-privacy a:hover { text-decoration: underline; }
+
+  /* CORRUPTION BANNER */
+  .corruption-banner {
+    background: var(--amber-lt);
+    border-bottom: 2px solid var(--amber);
+    padding: 1rem 2rem;
+    display: none;
+    align-items: flex-start;
+    gap: .75rem;
+    font-size: .9rem;
+    line-height: 1.5;
+    color: #92400e;
+  }
+  .corruption-banner.visible { display: flex; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 1rem 0 2rem; }
+  .empty-state-icon { font-size: 4rem; margin-bottom: 1.5rem; display: block; }
+  .empty-state h2 {
+    font-size: clamp(1.6rem,4vw,2.2rem); font-weight: 700; color: var(--navy);
+    margin-bottom: .75rem; letter-spacing: -.02em;
+  }
+  .empty-state p { font-size: 1.05rem; color: var(--muted); max-width: 480px; margin: 0 auto 2.5rem; line-height: 1.6; }
+  .empty-cta-row { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+  .empty-preview {
+    background: var(--bg2); border-radius: var(--radius); padding: 1.5rem 2rem;
+    max-width: 400px; margin: 0 auto; text-align: left;
+  }
+  .empty-preview h3 { font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1rem; }
+  .empty-preview li { display: flex; align-items: center; gap: .6rem; padding: .4rem 0; font-size: .9rem; color: var(--text); list-style: none; }
+
+  /* FOOTER — identical to index.html */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  footer strong { color: var(--navy); }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.5); z-index: 100;
+    align-items: center; justify-content: center; padding: 1.5rem;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: #fff; border-radius: var(--radius); padding: 2rem;
+    max-width: 440px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  }
+  .modal h2 { font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: .75rem; }
+  .modal p { font-size: .9rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.25rem; }
+  .modal label { font-size: .85rem; font-weight: 600; display: block; margin-bottom: .4rem; }
+  .modal input[type="text"] {
+    width: 100%; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: .6rem .9rem; font-family: 'DM Sans', sans-serif; font-size: 1rem; margin-bottom: 1.25rem;
+  }
+  .modal input:focus { outline: 2px solid var(--red); border-color: var(--red); }
+  .modal-actions { display: flex; gap: .75rem; justify-content: flex-end; }
+  .btn-cancel {
+    background: transparent; border: 1.5px solid var(--border); border-radius: 8px;
+    padding: .55rem 1.25rem; font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: .9rem; cursor: pointer;
+    color: var(--text); transition: border-color .15s;
+  }
+  .btn-cancel:hover { border-color: var(--navy); }
+  .btn-confirm-reset {
+    background: var(--red); color: #fff; border: none; border-radius: 8px;
+    padding: .55rem 1.25rem; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .9rem; cursor: pointer;
+  }
+  .btn-confirm-reset:disabled { opacity: .4; cursor: not-allowed; }
+
+  /* RESPONSIVE */
+  @media (max-width:768px) {
+    .subject-grid { grid-template-columns: 1fr; }
+    .goals-grid { grid-template-columns: 1fr; }
+    .goal-form { flex-direction: column; align-items: stretch; }
+  }
+  @media (max-width:600px) {
+    nav { padding: .6rem 1rem; gap: .75rem; }
+    .nav-spacer { display: none; }
+    .main { padding: 2.5rem 1rem; }
+    .hero { padding: 2.5rem 1rem 0; }
+    .stat-item { padding: .75rem 1.5rem; width: 50%; }
+    .stat-item:nth-child(even) { border-right: none; }
+    .stat-num { font-size: 1.2rem; }
+    .activity-card { width: 180px; }
+    .mastery-label { min-width: 100px; }
+    .utilities { flex-direction: column; align-items: flex-start; }
+    .util-privacy { margin-left: 0; }
+  }
+
+  /* REDUCED MOTION */
+  @media (prefers-reduced-motion: reduce) {
+    .mastery-bar, .ach-bar, .goal-ring-fill,
+    .card, .activity-card, .btn-primary { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Corruption banner -->
+<div class="corruption-banner" id="corruption-banner" role="alert" aria-live="polite">
+  <span style="font-size:1.3rem;flex-shrink:0">&#x26A0;&#xFE0F;</span>
+  <span>Some of your saved progress couldn't be read and was reset. If you previously downloaded a backup, you can restore it below.</span>
+</div>
+
+<!-- Nav — matches existing site -->
+<nav>
+  <a href="index.html" class="nav-logo">SAT<span>bot</span></a>
+  <a href="maths.html"    class="nav-link">Maths</a>
+  <a href="reading.html"  class="nav-link">Reading</a>
+  <a href="spag.html"     class="nav-link">SPaG</a>
+  <div class="nav-spacer"></div>
+  <a href="progress.html" class="nav-link" aria-current="page">My Progress</a>
+  <span style="color:rgba(255,255,255,.7);font-size:.9rem;font-weight:500;">Contact Us: <a href="mailto:satbot.uk@gmail.com" style="color:#fff;text-decoration:none;font-weight:600;">satbot.uk@gmail.com</a></span>
+</nav>
+
+<!-- Hero and stat strip — populated by JS -->
+<div id="hero-mount"></div>
+
+<!-- Main content -->
+<main class="main" id="main-mount" aria-busy="true"></main>
+
+<!-- Footer — matches existing site -->
+<footer>
+  <strong>SAT<span style="color:var(--amber)">bot</span></strong> &mdash; Free Year 6 SATs practice. No accounts, no tracking.
+</footer>
+
+<!-- Reset confirmation modal -->
+<div class="modal-overlay" id="reset-modal" role="dialog" aria-modal="true" aria-labelledby="reset-modal-title">
+  <div class="modal">
+    <h2 id="reset-modal-title">Reset all progress</h2>
+    <p>This will permanently delete all your scores, streaks, goals, and achievements. It can't be undone.<br><br>Type <strong>reset</strong> below to confirm.</p>
+    <label for="reset-confirm-input">Type "reset" to confirm</label>
+    <input type="text" id="reset-confirm-input" autocomplete="off" placeholder="reset" aria-describedby="reset-modal-title">
+    <div class="modal-actions">
+      <button class="btn-cancel" id="reset-cancel-btn">Cancel</button>
+      <button class="btn-confirm-reset" id="reset-confirm-btn" disabled>Delete everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- Privacy info modal -->
+<div class="modal-overlay" id="privacy-modal" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title">
+  <div class="modal" style="max-width:520px">
+    <h2 id="privacy-modal-title">About your data</h2>
+    <p>SATBot stores your practice history <strong>only on this device</strong>, in your browser's local storage. Nothing is sent to a server. No one at SATBot can see your scores.</p>
+    <p>If you clear your browser data or use a different device, your progress won't be there. Use the "Download my progress" button to save a backup file.</p>
+    <p style="margin-bottom:0">We don't collect your name, email, or any personal information. The optional display name stays on your device only.</p>
+    <div class="modal-actions" style="margin-top:1.5rem">
+      <button class="btn-cancel" id="privacy-close-btn">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ======================================================================
+// Dashboard controller
+// ======================================================================
+
+var META = ProgressStore.ACHIEVEMENT_META;
+
+(async function() {
+  var store = new ProgressStore();
+
+  if (await store.wasCorruptionDetected()) {
+    document.getElementById('corruption-banner').classList.add('visible');
+  }
+
+  const [hasData, summary, breakdown, timeline, mastery, recent, goals, achievements, prefs] =
+    await Promise.all([
+      store.hasData(),
+      store.getSummary(),
+      store.getSubjectBreakdown(),
+      store.getScoreTimeline({ limitDays: 90 }),
+      store.getTopicMastery(),
+      store.getRecentAttempts(5),
+      store.getActiveGoals(),
+      store.getEarnedAchievements(),
+      store.getPreferences()
+    ]);
+
+  document.getElementById('main-mount').setAttribute('aria-busy', 'false');
+
+  if (!hasData) {
+    renderEmptyState();
+    return;
+  }
+
+  const goalProgress = await Promise.all(goals.map(g => store.getGoalProgress(g.id)));
+
+  renderHero(summary, achievements, prefs);
+  renderDashboard({ summary, breakdown, timeline, mastery, recent, goalProgress, achievements });
+  wireUtilities(store);
+})();
+
+// -- Helpers --
+
+function esc(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Subject colour scheme from the existing site
+var SUBJ = {
+  maths:   { label:'Maths',   icon:'🔢', color:'var(--blue)',   lt:'var(--blue-lt)',   cls:'blue',   href:'maths.html' },
+  reading: { label:'Reading', icon:'📖', color:'var(--green)',  lt:'var(--green-lt)',  cls:'green',  href:'reading.html' },
+  spag:    { label:'SPaG',    icon:'✏️',  color:'var(--purple)', lt:'var(--purple-lt)', cls:'purple', href:'spag.html' }
+};
+function S(k) { return SUBJ[k] || SUBJ.maths; }
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  var d = new Date(iso), now = new Date(), diff = Math.floor((now - d) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  if (diff < 7)  return diff + ' days ago';
+  return d.toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function fmtMins(secs) {
+  if (!secs) return '';
+  var m = Math.round(secs / 60);
+  return m + ' min' + (m !== 1 ? 's' : '');
+}
+
+// -- Empty state --
+
+function renderEmptyState() {
+  document.getElementById('hero-mount').innerHTML = [
+    '<section class="hero">',
+    '  <div class="hero-badge">',
+    '    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="6" fill="#f59e0b"/></svg>',
+    '    Progress Tracking',
+    '  </div>',
+    '  <h1>Your progress will<br>appear <em>here!</em></h1>',
+    '  <p>Complete your first practice paper to start tracking your scores, streaks, and topic mastery.</p>',
+    '</section>',
+    '<div class="stats">',
+    '  <div class="stat-item"><div class="stat-num">0</div><div class="stat-lbl">Papers Done</div></div>',
+    '  <div class="stat-item"><div class="stat-num">0</div><div class="stat-lbl">Day Streak</div></div>',
+    '  <div class="stat-item"><div class="stat-num">&mdash;</div><div class="stat-lbl">Average</div></div>',
+    '</div>'
+  ].join('\n');
+
+  document.getElementById('main-mount').innerHTML = [
+    '<div class="empty-state">',
+    '  <span class="empty-state-icon" aria-hidden="true">📊</span>',
+    '  <h2>Ready to get started?</h2>',
+    '  <p>Pick a subject below, complete a paper, and your scores, charts and badges will appear right here.</p>',
+    '  <div class="empty-cta-row">',
+    '    <a href="maths.html"   class="btn-primary">🔢 Practise Maths</a>',
+    '    <a href="reading.html" class="btn-primary" style="background:var(--green);color:#fff">📖 Practise Reading</a>',
+    '    <a href="spag.html"    class="btn-primary" style="background:var(--purple);color:#fff">✏️ Practise SPaG</a>',
+    '  </div>',
+    '  <div class="empty-preview" role="complementary" aria-label="What you\'ll get">',
+    '    <h3>What you\'ll see here</h3>',
+    '    <ul>',
+    '      <li>📈 Score charts over time</li>',
+    '      <li>🔥 Daily practice streaks</li>',
+    '      <li>🎯 Topic mastery &mdash; see where to focus</li>',
+    '      <li>🏅 Badges as you hit milestones</li>',
+    '      <li>📋 Goals to work towards</li>',
+    '    </ul>',
+    '  </div>',
+    '</div>'
+  ].join('\n');
+}
+
+// -- Hero and stat strip --
+
+function renderHero(summary, achievements, prefs) {
+  var name = prefs.displayName ? esc(prefs.displayName) : null;
+  var greeting = name ? ('Welcome back, ' + name + '!') : 'Welcome back!';
+  var streak = summary.currentStreakDays;
+  var avg = summary.overallAveragePercent !== null ? summary.overallAveragePercent + '%' : '—';
+
+  // Recent achievement callout
+  var oneDayAgo = Date.now() - 86400000;
+  var fresh = achievements.find(function(a) { return new Date(a.earnedAt).getTime() > oneDayAgo; });
+  var callout = '';
+  if (fresh && META[fresh.code]) {
+    callout = '<div class="hero-achievement-callout">' +
+      '<span>' + (META[fresh.code].icon || '🏅') + '</span>' +
+      '<span>Just earned: <strong>' + esc(META[fresh.code].name) + '</strong></span>' +
+      '</div>';
+  }
+
+  document.getElementById('hero-mount').innerHTML = [
+    '<section class="hero">',
+    '  <div class="hero-badge">',
+    '    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="6" fill="#f59e0b"/></svg>',
+    '    Progress Tracking',
+    '  </div>',
+    '  <h1>' + greeting + '</h1>',
+    '  <p>Here\'s how your SATs practice is going. Keep it up!</p>',
+    '  ' + callout,
+    '</section>',
+    '<div class="stats">',
+    '  <div class="stat-item"><div class="stat-num">' + summary.totalPapersCompleted + '</div><div class="stat-lbl">Papers Done</div></div>',
+    '  <div class="stat-item"><div class="stat-num">' + (streak > 0 ? '🔥 ' + streak : '0') + '</div><div class="stat-lbl">Day Streak</div></div>',
+    '  <div class="stat-item"><div class="stat-num">' + avg + '</div><div class="stat-lbl">Overall Average</div></div>',
+    '  <div class="stat-item"><div class="stat-num">' + summary.totalAttempts + '</div><div class="stat-lbl">Total Attempts</div></div>',
+    '</div>'
+  ].join('\n');
+}
+
+// -- Main dashboard content --
+
+function renderDashboard(d) {
+  var root = document.getElementById('main-mount');
+  root.innerHTML = [
+    renderChartSection(),
+    renderSubjects(d.breakdown),
+    renderMastery(d.mastery),
+    renderActivity(d.recent),
+    renderGoals(d.goalProgress, d.achievements),
+    renderUtilitiesHTML()
+  ].join('\n');
+
+  buildChart(d.timeline);
+  wireGoalForm();
+}
+
+// -- 1. Performance chart --
+
+function renderChartSection() {
+  return [
+    '<section style="margin-bottom:4rem">',
+    '  <p class="section-label">Performance</p>',
+    '  <h2 class="section-title">Scores over time</h2>',
+    '  <p class="section-sub">See how your scores are trending across subjects.</p>',
+    '  <div class="card chart-card">',
+    '    <div style="display:flex;justify-content:flex-end;margin-bottom:1rem">',
+    '      <button class="chart-table-toggle" id="chart-toggle-btn" aria-expanded="false" aria-controls="chart-data-table">Show as table</button>',
+    '    </div>',
+    '    <div id="chart-container"><div class="chart-wrap"><canvas id="score-chart" aria-label="Line chart: score percentage over time per subject"></canvas></div></div>',
+    '    <table class="chart-data-table" id="chart-data-table" aria-label="Score data"><thead><tr><th>Date</th><th>Subject</th><th>Paper</th><th>Score</th></tr></thead><tbody id="chart-table-body"></tbody></table>',
+    '  </div>',
+    '</section>'
+  ].join('\n');
+}
+
+function buildChart(timeline) {
+  var container = document.getElementById('chart-container');
+  var toggleBtn = document.getElementById('chart-toggle-btn');
+
+  if (timeline.length < 2) {
+    container.innerHTML = '<div class="chart-empty"><strong>Not enough data yet</strong>Complete more papers to see your progress over time!<br><a href="index.html" style="display:inline-block;margin-top:.75rem;color:var(--navy);font-weight:700">← Back to practice papers</a></div>';
+    if (toggleBtn) toggleBtn.style.display = 'none';
+    return;
+  }
+
+  var colors = { maths:'#2563eb', reading:'#059669', spag:'#7c3aed' };
+  var subjects = ['maths','reading','spag'];
+  var allLabels = [];
+  var seen = {};
+  timeline.forEach(function(p) {
+    var lbl = new Date(p.date).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+    if (!seen[lbl]) { seen[lbl] = true; allLabels.push(lbl); }
+  });
+
+  var datasets = subjects.map(function(subj) {
+    var pts = timeline.filter(function(p) { return p.subject === subj; }).map(function(p) {
+      return { x: new Date(p.date).toLocaleDateString('en-GB', { day:'numeric', month:'short' }), y: p.percent, paperCode: p.paperCode, rawDate: p.date };
+    });
+    return { label: S(subj).label, data: pts, borderColor: colors[subj], backgroundColor: colors[subj] + '22', tension: 0.35, pointRadius: 5, pointHoverRadius: 8, fill: false };
+  }).filter(function(d) { return d.data.length > 0; });
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  new Chart(document.getElementById('score-chart'), {
+    type: 'line',
+    data: { labels: allLabels, datasets: datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: reduced ? false : { duration: 400 },
+      plugins: {
+        legend: { position:'bottom', labels: { usePointStyle:true, padding:20, font:{ family:'DM Sans', size:13 } } },
+        tooltip: {
+          callbacks: {
+            title: function(items) { return items[0] && items[0].raw && items[0].raw.rawDate ? new Date(items[0].raw.rawDate).toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short', year:'numeric' }) : ''; },
+            label: function(item) { return ' ' + (item.raw.paperCode || '') + ': ' + item.raw.y + '%'; }
+          }
+        }
+      },
+      scales: {
+        y: { min:0, max:100, ticks:{ callback: function(v) { return v+'%'; }, font:{ family:'DM Sans' } } },
+        x: { ticks:{ font:{ family:'DM Sans' }, maxRotation:45 } }
+      }
+    }
+  });
+
+  // Accessible data table
+  var tbody = document.getElementById('chart-table-body');
+  tbody.innerHTML = timeline.slice().sort(function(a,b) { return new Date(b.date) - new Date(a.date); }).map(function(p) {
+    return '<tr><td>' + new Date(p.date).toLocaleDateString('en-GB') + '</td><td>' + S(p.subject).label + '</td><td>' + esc(p.paperCode) + '</td><td>' + p.percent + '%</td></tr>';
+  }).join('');
+
+  toggleBtn.addEventListener('click', function() {
+    var table = document.getElementById('chart-data-table');
+    var open = table.classList.toggle('visible');
+    toggleBtn.setAttribute('aria-expanded', open);
+    toggleBtn.textContent = open ? 'Hide table' : 'Show as table';
+  });
+}
+
+// -- 2. Subject breakdown --
+
+function renderSubjects(breakdown) {
+  var trendMap = {
+    improving:        { chip:'chip-green',  label:'↗ Improving' },
+    flat:             { chip:'chip',        label:'→ Steady' },
+    declining:        { chip:'chip-red',    label:'↘ Needs focus' },
+    insufficient_data:{ chip:'chip',        label:'Practise more to see trends' }
+  };
+
+  var cards = breakdown.map(function(b) {
+    var s = S(b.subject);
+    var t = trendMap[b.trend] || trendMap.insufficient_data;
+    var pct = b.attemptCount > 0 ? b.averagePercent + '%' : '—';
+    return [
+      '<div class="card card-' + s.cls + '">',
+      '  <div class="card-icon icon-' + s.cls + '">' + s.icon + '</div>',
+      '  <div class="card-title">' + s.label + '</div>',
+      '  <div style="font-size:2.2rem;font-weight:800;color:var(--navy);letter-spacing:-.03em;margin-bottom:.25rem">' + pct + '</div>',
+      '  <div class="card-desc" style="margin-bottom:1rem">' + b.attemptCount + ' attempt' + (b.attemptCount !== 1 ? 's' : '') + '</div>',
+      '  <div class="card-meta"><span class="chip ' + t.chip + '">' + t.label + '</span></div>',
+      '  <div style="display:flex;gap:.75rem;flex-wrap:wrap">',
+      '    <a href="' + s.href + '" class="btn-card-primary" style="flex:1;min-width:120px">▶ Practise ' + s.label + '</a>',
+      '  </div>',
+      '</div>'
+    ].join('\n');
+  }).join('\n');
+
+  return [
+    '<section style="margin-bottom:4rem">',
+    '  <p class="section-label">Subjects</p>',
+    '  <h2 class="section-title">Subject breakdown</h2>',
+    '  <p class="section-sub">Your performance at a glance across all three SATs subjects.</p>',
+    '  <div class="subject-grid">' + cards + '</div>',
+    '</section>'
+  ].join('\n');
+}
+
+// -- 3. Topic mastery --
+
+function renderMastery(mastery) {
+  if (mastery.length === 0) {
+    return [
+      '<section style="margin-bottom:4rem">',
+      '  <p class="section-label">Diagnostics</p>',
+      '  <h2 class="section-title">Topic mastery</h2>',
+      '  <div class="card" style="padding:2rem;text-align:center">',
+      '    <p style="color:var(--muted);font-size:.95rem">Complete papers with topic-tagged questions to see your strengths and areas to improve.</p>',
+      '  </div>',
+      '</section>'
+    ].join('\n');
+  }
+
+  var top8 = mastery.slice(0, 8);
+  var bandLabel = { needs_practice:'Needs practice', getting_there:'Getting there', mastered:'Mastered' };
+
+  var rows = top8.map(function(t) {
+    var s = S(t.subject);
+    return [
+      '<div class="mastery-row" role="listitem" aria-label="' + esc(t.topic) + ': ' + t.accuracyPercent + '% - ' + bandLabel[t.band] + '">',
+      '  <span class="mastery-label">' + esc(t.topic) + '</span>',
+      '  <div class="mastery-bar-wrap"><div class="mastery-bar ' + t.band + '" style="width:' + t.accuracyPercent + '%"></div></div>',
+      '  <span class="mastery-pct">' + t.accuracyPercent + '%</span>',
+      '  <span class="chip chip-' + s.cls + '" style="font-size:.7rem">' + s.label + '</span>',
+      (t.band === 'needs_practice' ? '  <a href="' + s.href + '" style="font-size:.8rem;color:var(--navy);font-weight:600;text-decoration:none;white-space:nowrap">Practise →</a>' : ''),
+      '</div>'
+    ].join('\n');
+  }).join('\n');
+
+  return [
+    '<section style="margin-bottom:4rem">',
+    '  <p class="section-label">Diagnostics</p>',
+    '  <h2 class="section-title">Topic mastery</h2>',
+    '  <p class="section-sub">Your weakest topics first. Focus here for the biggest improvement.</p>',
+    '  <div class="card" style="padding:1.5rem 2rem">',
+    '    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;font-size:.78rem">',
+    '      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:12px;height:12px;border-radius:3px;background:#ef4444;display:inline-block"></span>Needs practice</span>',
+    '      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:12px;height:12px;border-radius:3px;background:var(--amber);display:inline-block"></span>Getting there</span>',
+    '      <span style="display:flex;align-items:center;gap:.35rem"><span style="width:12px;height:12px;border-radius:3px;background:var(--green);display:inline-block"></span>Mastered</span>',
+    '    </div>',
+    '    <div role="list">' + rows + '</div>',
+    '  </div>',
+    '</section>'
+  ].join('\n');
+}
+
+// -- 4. Recent activity --
+
+function renderActivity(recent) {
+  if (recent.length === 0) return '';
+
+  var cards = recent.map(function(a) {
+    var s = S(a.subject);
+    var pct = a.maxScore > 0 ? Math.round(a.score / a.maxScore * 100) : 0;
+    return [
+      '<div class="activity-card" role="listitem">',
+      '  <div class="activity-card-header">',
+      '    <span class="activity-dot" style="background:' + s.color + '"></span>',
+      '    <span class="activity-paper">' + esc(a.paperCode) + '</span>',
+      '  </div>',
+      '  <div class="activity-score">' + a.score + ' / ' + a.maxScore + '</div>',
+      '  <div class="activity-pct">' + pct + '%</div>',
+      '  <div class="activity-meta">' + (a.durationSeconds ? '⏱ ' + fmtMins(a.durationSeconds) + '<br>' : '') + fmtDate(a.completedAt) + '</div>',
+      '</div>'
+    ].join('\n');
+  }).join('\n');
+
+  return [
+    '<section style="margin-bottom:4rem">',
+    '  <p class="section-label">Recent</p>',
+    '  <h2 class="section-title">Latest activity</h2>',
+    '  <p class="section-sub">Your most recent practice papers.</p>',
+    '  <div class="activity-scroll" role="list">' + cards + '</div>',
+    '</section>'
+  ].join('\n');
+}
+
+// -- 5. Goals and achievements --
+
+function renderGoals(goalProgress, achievements) {
+  var goalCards = goalProgress.map(function(gp) {
+    var g = gp.goal;
+    var circ = 87.96;
+    var filled = Math.round(Math.min(gp.currentPercent, 100) / 100 * circ);
+    var remaining = circ - filled;
+    var daysLeft = Math.ceil((new Date(g.deadline) - Date.now()) / 86400000);
+    var daysStr = daysLeft > 0 ? daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' left' : 'Deadline passed';
+
+    return [
+      '<div class="goal-card" role="listitem">',
+      '  <div class="goal-ring-wrap">',
+      '    <svg viewBox="0 0 36 36"><circle class="goal-ring-bg" cx="18" cy="18" r="14"/><circle class="goal-ring-fill ' + (gp.onTrack ? 'on-track' : 'at-risk') + '" cx="18" cy="18" r="14" stroke-dasharray="' + filled + ' ' + remaining + '"/><text class="goal-ring-text" x="18" y="18.5">' + gp.currentPercent + '%</text></svg>',
+      '  </div>',
+      '  <div class="goal-info">',
+      '    <div class="goal-title">' + g.targetPercent + '% in ' + S(g.subject).label + '</div>',
+      '    <div class="goal-deadline">' + daysStr + '</div>',
+      '    <button class="goal-delete" data-goal-id="' + esc(g.id) + '" aria-label="Delete this goal">🗑</button>',
+      '  </div>',
+      '</div>'
+    ].join('\n');
+  }).join('\n');
+
+  var formHTML = [
+    '<div class="goal-form-card">',
+    (goalProgress.length === 0 ? '  <p>Set a target to work towards &mdash; it helps!</p>' : '  <p>Add another goal</p>'),
+    '  <form class="goal-form" id="goal-form">',
+    '    <select name="subject" required aria-label="Subject"><option value="maths">Maths</option><option value="reading">Reading</option><option value="spag">SPaG</option></select>',
+    '    <input type="number" name="targetPercent" min="1" max="100" value="80" required aria-label="Target %">',
+    '    <input type="date" name="deadline" required aria-label="Deadline">',
+    '    <button type="submit" class="btn-card-primary">' + (goalProgress.length === 0 ? 'Set goal' : '+ Add goal') + '</button>',
+    '  </form>',
+    '</div>'
+  ].join('\n');
+
+  // Next achievement
+  var earnedCodes = {};
+  achievements.forEach(function(a) { earnedCodes[a.code] = true; });
+  var allCodes = ['first_paper','five_papers','ten_papers','three_streak','seven_streak','first_full_marks','improver'];
+  var nextCode = allCodes.find(function(c) { return !earnedCodes[c]; });
+  var nextHTML = '';
+  if (nextCode && META[nextCode]) {
+    nextHTML = [
+      '<div class="next-achievement-card">',
+      '  <div class="next-ach-title">Next achievement</div>',
+      '  <div class="next-ach-name">' + (META[nextCode].icon || '') + ' ' + esc(META[nextCode].name) + '</div>',
+      '  <div class="next-ach-hint">' + esc(META[nextCode].description) + '</div>',
+      '</div>'
+    ].join('\n');
+  } else if (!nextCode) {
+    nextHTML = '<div class="next-achievement-card"><div class="next-ach-name">🏆 All achievements unlocked! Amazing work!</div></div>';
+  }
+
+  return [
+    '<section style="margin-bottom:4rem">',
+    '  <p class="section-label">Goals & Badges</p>',
+    '  <h2 class="section-title">Goals &amp; milestones</h2>',
+    '  <p class="section-sub">Set targets and track your badges.</p>',
+    (goalProgress.length > 0 ? '  <div class="goals-grid" role="list">' + goalCards + '</div>' : ''),
+    '  ' + formHTML,
+    '  ' + nextHTML,
+    '</section>'
+  ].join('\n');
+}
+
+// -- 6. Utilities --
+
+function renderUtilitiesHTML() {
+  return [
+    '<div class="utilities">',
+    '  <button class="btn-card-secondary" id="download-btn">⬇ Download my progress</button>',
+    '  <button class="btn-card-secondary" id="reset-btn" style="border-color:var(--red-lt);color:var(--red)">🗑 Reset my progress</button>',
+    '  <span class="util-privacy">Your progress is saved on this device only. <a href="#" id="privacy-link">Learn more</a></span>',
+    '</div>'
+  ].join('\n');
+}
+
+function wireUtilities(store) {
+  document.addEventListener('click', async function(e) {
+    if (e.target.id === 'download-btn') {
+      var data = await store.exportAll();
+      var date = new Date().toISOString().slice(0,10);
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+      var url  = URL.createObjectURL(blob);
+      var a    = document.createElement('a');
+      a.href = url; a.download = 'satbot-progress-' + date + '.json'; a.click();
+      URL.revokeObjectURL(url);
+    }
+  });
+
+  var modal = document.getElementById('reset-modal');
+  var input = document.getElementById('reset-confirm-input');
+  var btnR  = document.getElementById('reset-confirm-btn');
+  var btnC  = document.getElementById('reset-cancel-btn');
+
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'reset-btn') { modal.classList.add('visible'); input.value=''; btnR.disabled=true; input.focus(); }
+  });
+  input.addEventListener('input', function() { btnR.disabled = input.value.trim().toLowerCase() !== 'reset'; });
+  btnC.addEventListener('click', function() { modal.classList.remove('visible'); });
+  btnR.addEventListener('click', async function() {
+    if (input.value.trim().toLowerCase() !== 'reset') return;
+    await store.resetAll();
+    window.location.reload();
+  });
+  modal.addEventListener('click', function(e) { if (e.target === modal) modal.classList.remove('visible'); });
+
+  var pmModal = document.getElementById('privacy-modal');
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'privacy-link') { e.preventDefault(); pmModal.classList.add('visible'); document.getElementById('privacy-close-btn').focus(); }
+    if (e.target.id === 'privacy-close-btn' || e.target === pmModal) pmModal.classList.remove('visible');
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { modal.classList.remove('visible'); pmModal.classList.remove('visible'); }
+  });
+}
+
+function wireGoalForm() {
+  var form = document.getElementById('goal-form');
+  if (!form) return;
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var fd = new FormData(form);
+    var store = new ProgressStore();
+    await store.createGoal({ subject: fd.get('subject'), targetPercent: Number(fd.get('targetPercent')), deadline: new Date(fd.get('deadline')).toISOString() });
+    window.location.reload();
+  });
+  document.addEventListener('click', async function(e) {
+    if (!e.target.dataset || !e.target.dataset.goalId) return;
+    var store = new ProgressStore();
+    await store.deleteGoal(e.target.dataset.goalId);
+    window.location.reload();
+  });
+}
+</script>
+</body>
+</html>

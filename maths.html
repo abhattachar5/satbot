@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Year 6 Maths SATS Practice Papers | Arithmetic & Reasoning</title>
+<meta name="description" content="Free Year 6 Maths SATS practice papers. Master arithmetic, reasoning & problem-solving. Complete papers with mark schemes. Build exam confidence today.">
+<link rel="canonical" href="https://satbot.co.uk/maths.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Year 6 Maths SATS Practice Papers | Arithmetic & Reasoning">
+<meta property="og:description" content="Free Year 6 Maths SATS practice papers. Master arithmetic, reasoning & problem-solving. Complete papers with mark schemes. Build exam confidence today.">
+<meta property="og:url" content="https://satbot.co.uk/maths.html">
+<meta property="og:site_name" content="SATBot">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What topics are covered in Year 6 Maths SATS?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Year 6 Maths SATS cover two papers: Paper 1 Arithmetic (mental and written calculation) and Paper 2 Reasoning (problem-solving, fractions, decimals, percentages, geometry and statistics). All KS2 maths topics are tested." }
+    },
+    {
+      "@type": "Question",
+      "name": "How long is the Year 6 Maths SATS exam?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Paper 1 Arithmetic is 30 minutes and Paper 2 Reasoning is 40 minutes. SATBot's practice papers use these same time limits so students practise under realistic exam conditions." }
+    },
+    {
+      "@type": "Question",
+      "name": "Are calculators allowed in Year 6 Maths SATS?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No — calculators are not permitted in either Maths SATS paper. Students are expected to use written methods and mental arithmetic throughout." }
+    },
+    {
+      "@type": "Question",
+      "name": "How many Maths SATS practice papers are available?",
+      "acceptedAnswer": { "@type": "Answer", "text": "SATBot offers 6 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Paper 2 Reasoning paper, giving 240 practice questions in total." }
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="data-maths.js"></script>
+<script src="progress.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --navy:#1a2e5a; --navy-mid:#264278; --amber:#f59e0b; --green:#059669; --green-lt:#d1fae5; --red:#dc2626; --red-lt:#fee2e2; --bg:#fafaf8; --bg2:#f3f2ef; --text:#1c1c1e; --muted:#6b7280; --border:#e5e4e0; --blue:#2563eb; --blue-lt:#eff6ff; }
+  body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+  nav { background:var(--navy); padding:0 2rem; display:flex; align-items:center; gap:2rem; min-height:56px; flex-wrap:wrap; }
+  .nav-logo { font-size:1.25rem; font-weight:700; color:#fff; text-decoration:none; letter-spacing:-.5px; }
+  .nav-logo span { color:var(--amber); }
+  nav a.nl { color:rgba(255,255,255,.7); text-decoration:none; font-size:.9rem; font-weight:500; }
+  nav a.nl:hover, nav a.nl.active { color:#fff; font-weight:600; }
+  .nav-spacer { flex:1; }
+  #root { min-height:calc(100vh - 56px); }
+  @media (max-width:600px) {
+    nav { padding:.5rem .75rem; gap:.6rem; }
+    .nav-spacer { display:none; }
+    nav a[href*="pdf"] { display:none; }
+    nav a.nl { font-size:.8rem; }
+  }
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">SAT<span>bot</span></a>
+  <a href="maths.html" class="nl active">Maths</a>
+  <a href="reading.html" class="nl">Reading</a>
+  <a href="spag.html" class="nl">SPaG</a>
+  <div class="nav-spacer"></div>
+  <a href="progress.html" class="nl">My Progress</a>
+  <a href="pdf-maths.html" class="nl">⬇ Download PDF</a>
+</nav>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+function normalizeMathsAnswer(str) {
+  const unicodeFractions = {
+    '½':'1/2','⅓':'1/3','⅔':'2/3','¼':'1/4','¾':'3/4',
+    '⅕':'1/5','⅖':'2/5','⅗':'3/5','⅘':'4/5','⅙':'1/6','⅚':'5/6',
+    '⅛':'1/8','⅜':'3/8','⅝':'5/8','⅞':'7/8','⅐':'1/7','⅑':'1/9','⅒':'1/10'
+  };
+  const supDigits = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'};
+  const subDigits = {'₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9'};
+  let s = (str || '').trim().toLowerCase();
+  // Insert space between whole number digit and following unicode fraction char (mixed numbers: 2⅔ → 2 2/3)
+  s = s.replace(/(\d)([½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞⅐⅑⅒])/g, '$1 $2');
+  // Insert space between whole number digit and following superscript digit (2⁷⁄₁₂ → 2 7/12)
+  s = s.replace(/(\d)([⁰¹²³⁴⁵⁶⁷⁸⁹])/g, '$1 $2');
+  // Replace simple unicode fractions
+  for (const [uf, af] of Object.entries(unicodeFractions)) {
+    s = s.replace(new RegExp(uf.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), af);
+  }
+  // Replace superscript/subscript digits and fraction slash
+  s = s.replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, d => supDigits[d]);
+  s = s.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, d => subDigits[d]);
+  s = s.replace(/⁄/g, '/');
+  // Normalise Unicode minus sign to ASCII hyphen-minus
+  s = s.replace(/−/g, '-');
+  // Strip currency symbols
+  s = s.replace(/£/g, '');
+  // Remove thousands-separator commas (420,000 → 420000; 1,234,567 → 1234567)
+  // Matches the full thousands-formatted number and strips internal commas only
+  s = s.replace(/\b\d{1,3}(?:,\d{3})+\b/g, m => m.replace(/,/g, ''));
+  // Strip trailing decimal zeros: 0.40 → 0.4, 1.500 → 1.5
+  s = s.replace(/\d+\.\d+/g, n => String(parseFloat(n)));
+  // Strip measurement units that follow a number (longest units first to avoid partial match)
+  // Note: ² and ³ have already been converted to 2 and 3 by the superscript step above,
+  // so we match cm2/cm3 etc. not the unicode superscript forms
+  s = s.replace(/(\d)\s*(cm3|m3|km3|cm2|m2|km2|km|cm|mm|ml|litres?|kg|mg|°[cf]|°)/gi, '$1');
+  // Strip standalone metre (m) and gram (g) after a number
+  s = s.replace(/(\d)\s*(m|g)(?!\w)/gi, '$1');
+  // Strip percentage sign after a number (75% and 75 both accepted)
+  s = s.replace(/(\d)%/g, '$1');
+  // Normalise "and" used as a list separator so both "and" and "," are accepted
+  s = s.replace(/\s+and\s+/g, ', ');
+  // Normalise comma separators so "17,29,41" matches "17, 29, 41"
+  s = s.replace(/\s*,\s*/g, ', ');
+  // Strip trailing comma (e.g. user types "-4, -3, -2," with an extra comma)
+  s = s.replace(/,\s*$/, '');
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+// Order-independent match: "38, 62" accepts "62 and 38" etc.
+function answersMatch(ua, ca) {
+  if (ua === ca) return true;
+  // If either side has comma-separated parts, sort both and compare
+  const split = s => s.split(', ').map(p => p.trim()).filter(Boolean).sort();
+  const uaParts = split(ua);
+  const caParts = split(ca);
+  return uaParts.length > 1 && uaParts.length === caParts.length &&
+         uaParts.every((p, i) => p === caParts[i]);
+}
+
+const TWEAKS = { showDisclaimer: true, disclaimerStyle: "banner", accentColor: "#f59e0b", showTipBox: true };
+
+// ─── STYLES ────────────────────────────────────────────────────────
+const S = {
+  page: { background:'#fafaf8', minHeight:'calc(100vh - 56px)', fontFamily:"'DM Sans',sans-serif" },
+  container: { maxWidth:'800px', margin:'0 auto', padding:'2.5rem 1.5rem 5rem' },
+  header: { background:'#fff', borderBottom:'1.5px solid #e5e4e0', padding:'1rem 2rem', display:'flex', alignItems:'center', gap:'1rem', flexWrap:'wrap', position:'sticky', top:0, zIndex:100 },
+  headerTitle: { fontSize:'1rem', fontWeight:700, color:'#1a2e5a', flex:1 },
+  timerBox: (warn) => ({ display:'flex', alignItems:'center', gap:'.4rem', background: warn ? '#fee2e2' : '#f3f2ef', borderRadius:'8px', padding:'.35rem .85rem', fontSize:'.875rem', fontWeight:600, color: warn ? '#dc2626' : '#1c1c1e' }),
+  progressBar: { height:'3px', background:'#e5e4e0' },
+  progressFill: (pct,color) => ({ height:'100%', background:color||'#2563eb', width:pct+'%', transition:'width .3s' }),
+  instrBox: { background:'#eff6ff', border:'1.5px solid #bfdbfe', borderRadius:'10px', padding:'1rem 1.25rem', marginBottom:'2rem', fontSize:'.875rem', color:'#1e40af', lineHeight:1.6 },
+  qCard: (focus) => ({ background:'#fff', border:`1.5px solid ${focus?'#2563eb':'#e5e4e0'}`, borderRadius:'12px', padding:'1.5rem', marginBottom:'1rem' }),
+  qNum: { fontSize:'.72rem', fontWeight:600, color:'#6b7280', letterSpacing:'.08em', textTransform:'uppercase', marginBottom:'.35rem' },
+  qText: { fontSize:'1.05rem', fontWeight:500, color:'#1c1c1e', lineHeight:1.55, marginBottom:'1rem', whiteSpace:'pre-line' },
+  input: { width:'100%', fontSize:'1rem', padding:'.55rem .85rem', border:'1.5px solid #e5e4e0', borderRadius:'8px', fontFamily:"'DM Sans',sans-serif", background:'#fff' },
+  markChip: { fontSize:'.72rem', color:'#6b7280', marginTop:'.4rem' },
+  stickyFooter: { position:'fixed', bottom:0, left:0, right:0, background:'#fff', borderTop:'1.5px solid #e5e4e0', padding:'.75rem 2rem', display:'flex', alignItems:'center', justifyContent:'space-between', zIndex:200 },
+  btnSubmit: { background:'#1a2e5a', color:'#fff', fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:'.9rem', padding:'.6rem 1.75rem', border:'none', borderRadius:'8px', cursor:'pointer' },
+  // Result
+  resultWrap: { maxWidth:'720px', margin:'0 auto', padding:'2.5rem 1.5rem 5rem' },
+  scoreCard: { background:'#fff', border:'1.5px solid #e5e4e0', borderRadius:'16px', padding:'2.5rem', textAlign:'center', marginBottom:'2rem', boxShadow:'0 2px 12px rgba(26,46,90,.08)' },
+  scoreBig: { fontSize:'4rem', fontWeight:800, color:'#1a2e5a', letterSpacing:'-.04em' },
+  rcCard: (ok) => ({ background: ok ? '#f0fdf4' : '#fef2f2', border:`1.5px solid ${ok ? '#059669' : '#dc2626'}`, borderRadius:'10px', padding:'1.25rem', marginBottom:'.75rem' }),
+};
+
+function Timer({ s }) {
+  const m = Math.floor(s/60); const sec = s%60; const warn = s<300;
+  return <div style={S.timerBox(warn)}>{warn?'⚠ ':''}{String(m).padStart(2,'0')}:{String(sec).padStart(2,'0')}</div>;
+}
+
+function Results({ paper, year, answers, onRetry, onBack }) {
+  const qs = paper.questions;
+  const totalMarks = qs.reduce((a,q)=>a+q.mark,0);
+  let earned = 0;
+  qs.forEach(q => {
+    const ua = normalizeMathsAnswer(answers[q.id]||'');
+    const ca = normalizeMathsAnswer(q.answer);
+    if (answersMatch(ua,ca)) earned+=q.mark;
+  });
+  const pct = Math.round((earned/totalMarks)*100);
+  const barColor = pct>=75?'#059669':pct>=50?'#f59e0b':'#dc2626';
+  const band = pct>=85?'Excellent!':pct>=70?'Good — at expected standard':pct>=50?'Getting there — keep practising':'Keep going — read the explanations below';
+
+  useEffect(() => {
+    const store = new ProgressStore();
+    const slug = paper.title.toLowerCase().includes('arithmetic') ? 'arith' : 'reason';
+    store.recordAttempt({
+      paperCode: 'maths-' + slug + '-' + (year || 'unknown'),
+      subject: 'maths',
+      score: earned,
+      maxScore: totalMarks,
+      completedAt: new Date().toISOString(),
+      questionResults: qs.map(q => ({
+        qId: 'maths-q' + q.id,
+        topic: q.topic || null,
+        correct: answersMatch(normalizeMathsAnswer(answers[q.id]||''), normalizeMathsAnswer(q.answer))
+      }))
+    }).then(() => store.evaluateAchievements());
+  }, []);
+
+  return (
+    <div style={S.resultWrap}>
+      <div style={S.scoreCard}>
+        <div style={S.scoreBig}>{earned}<span style={{fontSize:'2rem',color:'#6b7280'}}>/{totalMarks}</span></div>
+        <div style={{color:'#6b7280',marginTop:'.4rem'}}>{pct}% · {paper.title}</div>
+        <div style={{height:'10px',background:'#f3f2ef',borderRadius:'100px',margin:'1.5rem 0',overflow:'hidden'}}>
+          <div style={{height:'100%',borderRadius:'100px',background:barColor,width:pct+'%',transition:'width 1s'}}></div>
+        </div>
+        <div style={{fontWeight:600,color:barColor}}>{band}</div>
+      </div>
+      <div style={{fontSize:'1.1rem',fontWeight:700,color:'#1a2e5a',marginBottom:'1rem'}}>Question review</div>
+      {qs.map(q => {
+        const ua = normalizeMathsAnswer(answers[q.id]||'');
+        const ok = answersMatch(ua, normalizeMathsAnswer(q.answer));
+        return (
+          <div key={q.id} style={S.rcCard(ok)}>
+            <div style={{fontSize:'.72rem',fontWeight:600,color:'#6b7280',marginBottom:'.3rem'}}>Q{q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
+            <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.4rem',whiteSpace:'pre-line'}}>{q.q}</div>
+            {ok
+              ? <div style={{fontSize:'.82rem',fontWeight:700,color:'#059669'}}>✓ Correct — {q.answer}</div>
+              : <div>
+                  <div style={{fontSize:'.82rem',fontWeight:700,color:'#dc2626'}}>✗ Your answer: {answers[q.id]||'(no answer)'}</div>
+                  <div style={{fontSize:'.82rem',fontWeight:700,color:'#059669',marginTop:'.15rem'}}>Correct: {q.answer}</div>
+                </div>
+            }
+            <div style={{fontSize:'.82rem',color:'#374151',lineHeight:1.6,borderTop:'1px solid rgba(0,0,0,.07)',paddingTop:'.4rem',marginTop:'.4rem'}}>💡 {q.explanation}</div>
+          </div>
+        );
+      })}
+      <div style={{marginTop:'2rem',display:'flex',gap:'.75rem',flexWrap:'wrap'}}>
+        <button style={S.btnSubmit} onClick={onRetry}>↩ Try again</button>
+        <button style={{...S.btnSubmit,background:'transparent',color:'#1a2e5a',border:'1.5px solid #e5e4e0'}} onClick={onBack}>← Choose another paper</button>
+        <a href="index.html" style={{...S.btnSubmit,background:'transparent',color:'#1a2e5a',border:'1.5px solid #e5e4e0',textDecoration:'none',display:'inline-flex',alignItems:'center'}}>🏠 Home</a>
+      </div>
+    </div>
+  );
+}
+
+function QuestionPaper({ paper, onSubmit }) {
+  const [answers, setAnswers] = useState({});
+  const [secondsLeft, setSecondsLeft] = useState(paper.time);
+  const [submitted, setSubmitted] = useState(false);
+  const [focusId, setFocusId] = useState(null);
+
+  useEffect(() => {
+    if (submitted) return;
+    const t = setInterval(() => setSecondsLeft(s => { if(s<=1){clearInterval(t);handleSubmit();return 0;} return s-1; }), 1000);
+    return () => clearInterval(t);
+  }, [submitted]);
+
+  const answered = Object.keys(answers).filter(k=>(answers[k]||'').trim()).length;
+  const total = paper.questions.length;
+  const pct = Math.round((answered/total)*100);
+
+  function handleSubmit() { if(submitted) return; setSubmitted(true); onSubmit(answers); }
+
+  return (
+    <div style={S.page}>
+      <div style={S.header}>
+        <div style={S.headerTitle}>📐 {paper.title}</div>
+        <Timer s={secondsLeft}/>
+      </div>
+      <div style={S.progressBar}><div style={S.progressFill(pct,'#2563eb')}></div></div>
+      <div style={S.container}>
+        <div style={S.instrBox}><strong>Instructions: </strong>{paper.instructions}</div>
+        {paper.questions.map(q => (
+          <div key={q.id} style={S.qCard(focusId===q.id)}>
+            <div style={S.qNum}>Question {q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
+            <div style={S.qText} id={`q${q.id}-text`}>{q.q}</div>
+            <input
+              style={S.input}
+              type="text"
+              placeholder="Your answer…"
+              value={answers[q.id]||''}
+              onFocus={()=>setFocusId(q.id)}
+              onBlur={()=>setFocusId(null)}
+              onChange={e=>setAnswers(p=>({...p,[q.id]:e.target.value}))}
+              aria-labelledby={`q${q.id}-text`}
+            />
+            {/,\s/.test(q.answer) && (
+              <div style={{fontSize:'.75rem',color:'#6b7280',marginTop:'.3rem'}}>Separate multiple answers with a comma, e.g. 1, 2, 3</div>
+            )}
+            <div style={S.markChip}>{q.mark} mark{q.mark>1?'s':''}</div>
+          </div>
+        ))}
+        <div style={{height:'5rem'}}></div>
+      </div>
+      <div style={S.stickyFooter}>
+        <span style={{fontSize:'.85rem',color:'#6b7280'}}>{answered} of {total} answered</span>
+        <button style={S.btnSubmit} onClick={handleSubmit}>Submit answers →</button>
+      </div>
+    </div>
+  );
+}
+
+// ─── DISCLAIMER BANNER ────────────────────────────────────────────
+function DisclaimerBanner({ style, accent }) {
+  const [dismissed, setDismissed] = useState(false);
+  if (dismissed) return null;
+
+  if (style === 'subtle') {
+    return (
+      <div style={{borderBottom:'1px solid #e5e4e0',background:'#fafaf8',padding:'.5rem 2rem',display:'flex',alignItems:'center',gap:'.75rem',flexWrap:'wrap'}}>
+        <span style={{fontSize:'.75rem',color:'#6b7280',lineHeight:1.5}}>
+          <strong style={{color:'#1a2e5a'}}>Practice resource only.</strong> These questions are written <em>in the style of</em> KS2 SATs papers — they are not official past papers or endorsed by the Standards &amp; Testing Agency.
+        </span>
+        <button onClick={()=>setDismissed(true)} style={{marginLeft:'auto',background:'none',border:'none',cursor:'pointer',color:'#aaa',fontSize:'1rem',lineHeight:1}}>✕</button>
+      </div>
+    );
+  }
+
+  if (style === 'toast') {
+    return (
+      <div style={{position:'fixed',bottom:'1.5rem',left:'50%',transform:'translateX(-50%)',zIndex:300,background:'#1a2e5a',color:'#fff',borderRadius:'10px',padding:'.75rem 1.25rem',fontSize:'.8rem',maxWidth:'480px',width:'calc(100% - 3rem)',display:'flex',gap:'1rem',alignItems:'center',boxShadow:'0 4px 24px rgba(0,0,0,.2)'}}>
+        <span style={{flex:1,lineHeight:1.5}}>⚠ <strong>Practice resource:</strong> Questions are written in the SATs style. Not official STA papers.</span>
+        <button onClick={()=>setDismissed(true)} style={{background:'rgba(255,255,255,.15)',border:'none',cursor:'pointer',color:'#fff',fontSize:'.75rem',fontWeight:700,borderRadius:'6px',padding:'.25rem .6rem',fontFamily:"'DM Sans',sans-serif"}}>OK</button>
+      </div>
+    );
+  }
+
+  // default: banner
+  return (
+    <div style={{background:`${accent}18`,borderBottom:`2px solid ${accent}`,padding:'.75rem 2rem',display:'flex',alignItems:'center',gap:'1rem',flexWrap:'wrap'}}>
+      <div style={{flex:1,minWidth:'200px'}}>
+        <div style={{fontSize:'.8rem',fontWeight:700,color:'#1a2e5a',marginBottom:'.15rem'}}>
+          📝 Practice resource — not official SATs papers
+        </div>
+        <div style={{fontSize:'.775rem',color:'#374151',lineHeight:1.5}}>
+          All questions on SATBot are <strong>original questions written in the style of KS2 SATs</strong>. They are not past papers, not produced by, and not affiliated with the Department for Education or the Standards and Testing Agency (STA).
+        </div>
+      </div>
+      <button onClick={()=>setDismissed(true)} style={{background:'none',border:`1px solid ${accent}`,cursor:'pointer',color:'#1a2e5a',fontSize:'.75rem',fontWeight:600,borderRadius:'6px',padding:'.3rem .75rem',fontFamily:"'DM Sans',sans-serif",whiteSpace:'nowrap'}}>Got it ✕</button>
+    </div>
+  );
+}
+
+function StartScreen({ onStart, tweaks }) {
+  const [selectedYear, setSelectedYear] = useState(null);
+  const { showDisclaimer, disclaimerStyle, accentColor, showTipBox } = tweaks;
+
+  const yearBtnStyle = (active) => ({
+    padding:'.5rem 1rem', border:`1.5px solid ${active?'#1a2e5a':'#e5e4e0'}`,
+    borderRadius:'8px', background: active?'#1a2e5a':'#fff',
+    color: active?'#fff':'#1a2e5a', fontFamily:"'DM Sans',sans-serif",
+    fontWeight:600, fontSize:'.875rem', cursor:'pointer'
+  });
+
+  return (
+    <div style={{fontFamily:"'DM Sans',sans-serif"}}>
+      {showDisclaimer && disclaimerStyle !== 'toast' && (
+        <DisclaimerBanner style={disclaimerStyle} accent={accentColor}/>
+      )}
+
+      <div style={{maxWidth:'680px',margin:'3rem auto',padding:'0 1.5rem'}}>
+        <div style={{marginBottom:'2rem'}}>
+          <div style={{fontSize:'.75rem',fontWeight:600,color:'#6b7280',letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'.5rem'}}>Mathematics</div>
+          <h1 style={{fontSize:'2rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.03em',marginBottom:'.5rem'}}>Year 6 Maths SATS Practice Papers</h1>
+          <p style={{color:'#6b7280',lineHeight:1.6}}>Choose a year and paper. Each set has Paper 1 (Arithmetic) and Paper 2 (Reasoning) written <strong style={{color:'#1a2e5a'}}>in the style of</strong> KS2 SATs papers — original questions, not official past papers.</p>
+        </div>
+
+        <div style={{marginBottom:'1.5rem'}}>
+          <div style={{fontSize:'.8rem',fontWeight:600,color:'#6b7280',marginBottom:'.75rem',textTransform:'uppercase',letterSpacing:'.07em'}}>Select year</div>
+          <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap'}}>
+            {MATHS_SETS.map(s => (
+              <button key={s.year} style={yearBtnStyle(selectedYear===s.year)} onClick={()=>setSelectedYear(s.year)}>{s.year}</button>
+            ))}
+          </div>
+        </div>
+
+        {selectedYear && (() => {
+          const set = MATHS_SETS.find(s=>s.year===selectedYear);
+          return (
+            <div>
+              {[set.paper1, set.paper2].map((p,i) => (
+                <div key={i} style={{background:'#fff',border:'1.5px solid #e5e4e0',borderRadius:'12px',padding:'1.5rem',marginBottom:'1rem',display:'flex',alignItems:'center',gap:'1.25rem'}}>
+                  <div style={{width:'48px',height:'48px',background:'#eff6ff',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',flexShrink:0}}>📐</div>
+                  <div style={{flex:1}}>
+                    <div style={{fontWeight:700,color:'#1a2e5a',marginBottom:'.25rem'}}>{selectedYear} — {p.title}</div>
+                    <div style={{fontSize:'.85rem',color:'#6b7280'}}>{p.questions.length} questions · {Math.round(p.time/60)} minutes · {p.questions.reduce((a,q)=>a+q.mark,0)} marks</div>
+                  </div>
+                  <button style={{background:'#1a2e5a',color:'#fff',fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:'.875rem',padding:'.6rem 1.25rem',border:'none',borderRadius:'8px',cursor:'pointer'}} onClick={()=>onStart(p, selectedYear)}>Start →</button>
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {!selectedYear && (
+          <div style={{padding:'1rem 1.25rem',background:'#f3f2ef',borderRadius:'10px',fontSize:'.85rem',color:'#6b7280',lineHeight:1.6}}>
+            👆 Select a year above to see the available papers.
+          </div>
+        )}
+
+        {showTipBox && (
+          <div style={{marginTop:'1.5rem',padding:'1rem 1.25rem',background:'#eff6ff',borderRadius:'10px',fontSize:'.85rem',color:'#1e40af',lineHeight:1.6}}>
+            💡 <strong>Tip:</strong> Start with Paper 1 Arithmetic, then try Paper 2 Reasoning. Results and full explanations appear at the end. Treat it like a real exam — no peeking!
+          </div>
+        )}
+
+        <div style={{marginTop:'1.25rem',padding:'.75rem 1rem',background:'#f3f2ef',borderRadius:'8px',fontSize:'.75rem',color:'#9ca3af',lineHeight:1.5,display:'flex',gap:'.5rem',alignItems:'flex-start'}}>
+          <span>ℹ️</span>
+          <span>SATBot questions are <em>original practice questions written in the style of KS2 SATs</em>. SATBot is not affiliated with, endorsed by, or produced in partnership with the Department for Education, Ofqual, or the Standards and Testing Agency.</span>
+        </div>
+      </div>
+
+      {showDisclaimer && disclaimerStyle === 'toast' && (
+        <DisclaimerBanner style="toast" accent={accentColor}/>
+      )}
+    </div>
+  );
+}
+
+function App() {
+  const [stage, setStage] = useState('start');
+  const [activePaper, setActivePaper] = useState(null);
+  const [activeYear, setActiveYear] = useState(null);
+  const [finalAnswers, setFinalAnswers] = useState({});
+
+  function startPaper(p, year) { setActivePaper(p); setActiveYear(year); setStage('paper'); }
+  function handleSubmit(ans) { setFinalAnswers(ans); setStage('results'); }
+  function handleRetry() { setFinalAnswers({}); setStage('paper'); }
+  function handleBack() { setFinalAnswers({}); setStage('start'); }
+
+  return (
+    <>
+      {stage==='start' && <StartScreen onStart={startPaper} tweaks={TWEAKS}/>}
+      {stage==='paper' && <QuestionPaper paper={activePaper} onSubmit={handleSubmit}/>}
+      {stage==='results' && <Results paper={activePaper} year={activeYear} answers={finalAnswers} onRetry={handleRetry} onBack={handleBack}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+
+<section style="background:#f3f2ef;border-top:1px solid #e5e4e0;padding:3rem 2rem;">
+  <div style="max-width:720px;margin:0 auto;">
+    <p style="font-size:.75rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#6b7280;margin-bottom:.75rem;">Common Questions</p>
+    <h2 style="font-size:1.4rem;font-weight:700;color:#1a2e5a;letter-spacing:-.02em;margin-bottom:2rem;">Year 6 Maths SATS — FAQs</h2>
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
+        <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">What topics are covered in Year 6 Maths SATS?</h3>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">Year 6 Maths SATS cover two papers: Paper 1 Arithmetic (mental and written calculation) and Paper 2 Reasoning (problem-solving, fractions, decimals, percentages, geometry and statistics).</p>
+      </div>
+      <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
+        <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">How long is the Year 6 Maths SATS exam?</h3>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">Paper 1 Arithmetic is 30 minutes and Paper 2 Reasoning is 40 minutes. SATBot's Maths SATS practice papers use these same time limits so students practise under realistic exam conditions.</p>
+      </div>
+      <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
+        <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">Are calculators allowed in Year 6 Maths SATS?</h3>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">No — calculators are not permitted in either Maths SATS paper. Students are expected to use written methods and mental arithmetic throughout both papers.</p>
+      </div>
+      <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
+        <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">How many Maths SATS practice papers are available here?</h3>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">SATBot offers 6 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Paper 2 Reasoning paper — 240 KS2 Maths practice questions in total, all free.</p>
+      </div>
+    </div>
+    <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e4e0;font-size:.9rem;color:#6b7280;">
+      Also try: <a href="reading.html" style="color:#1a2e5a;font-weight:600;">Year 6 English Reading SATS practice papers</a> &nbsp;·&nbsp; <a href="spag.html" style="color:#1a2e5a;font-weight:600;">Year 6 SPaG SATS practice papers</a> &nbsp;·&nbsp; <a href="spelling.html" style="color:#1a2e5a;font-weight:600;">Year 6 Spelling SATS practice</a>
+    </div>
+  </div>
+</section>
+<footer style="background:#1a2e5a;color:rgba(255,255,255,.6);text-align:center;padding:1.25rem 2rem;font-size:.8rem;">
+  <strong style="color:#fff;">SATBot</strong> — Year 6 KS2 SATs Practice &nbsp;·&nbsp; Questions are original and written in the style of KS2 SATs papers. Not affiliated with the Department for Education or Standards and Testing Agency.
+</footer>
+
+</body>
+</html>

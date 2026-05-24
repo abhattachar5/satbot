@@ -1,0 +1,350 @@
+// SATBot — Maths Question Sets
+// Multiple paper sets in the style of KS2 SATs, original questions
+
+const MATHS_SETS = [
+  {
+    year: "2024",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"524 + 368",answer:"892",mark:1,explanation:"524+368: 4+8=12 (write 2 carry 1); 2+6+1=9; 5+3=8. Answer: 892."},
+        {id:2,q:"2,003 − 476",answer:"1527",mark:1,explanation:"2003−476: borrow across zeros. 2003−476=1527. Check: 1527+476=2003 ✓"},
+        {id:3,q:"63 × 8",answer:"504",mark:1,explanation:"63×8=(60×8)+(3×8)=480+24=504."},
+        {id:4,q:"432 ÷ 6",answer:"72",mark:1,explanation:"432÷6: 42÷6=7, 12÷6=2. Answer: 72."},
+        {id:5,q:"³⁄₇ + ²⁄₇",answer:"⁵⁄₇",mark:1,explanation:"Same denominator — add numerators: 3+2=5. Answer: ⁵⁄₇."},
+        {id:6,q:"7.4 + 3.86",answer:"11.26",mark:1,explanation:"Line up decimals: 7.40+3.86=11.26."},
+        {id:7,q:"15.3 − 6.7",answer:"8.6",mark:1,explanation:"15.3−6.7=8.6. (Borrow: 13−7=6 tenths; 14−6−1=8 units.)"},
+        {id:8,q:"47 × 26",answer:"1222",mark:1,explanation:"47×26=47×20+47×6=940+282=1222."},
+        {id:9,q:"⅔ of 360",answer:"240",mark:1,explanation:"⅔ of 360: 360÷3=120; 120×2=240."},
+        {id:10,q:"13² (13 squared)",answer:"169",mark:1,explanation:"13²=13×13=169."},
+        {id:11,q:"0.6 × 0.4",answer:"0.24",mark:1,explanation:"6×4=24; two decimal places → 0.24."},
+        {id:12,q:"5,600 ÷ 8",answer:"700",mark:1,explanation:"56÷8=7; 5600÷8=700."},
+        {id:13,q:"⁵⁄₆ − ½",answer:"⅓",mark:1,explanation:"½=³⁄₆; ⁵⁄₆−³⁄₆=²⁄₆=⅓."},
+        {id:14,q:"3.7 × 1000",answer:"3700",mark:1,explanation:"Multiply by 1000: move digits three places left → 3700."},
+        {id:15,q:"576 ÷ 24",answer:"24",mark:1,explanation:"576÷24=24. Check: 24×24=576 ✓"},
+        {id:16,q:"40% of 320",answer:"128",mark:1,explanation:"10% of 320=32; 40%=4×32=128."},
+        {id:17,q:"2¼ + 3¾",answer:"6",mark:1,explanation:"2¼+3¾=5+¼+¾=5+1=6."},
+        {id:18,q:"√225",answer:"15",mark:1,explanation:"√225=15 (15×15=225)."},
+        {id:19,q:"748 × 6",answer:"4488",mark:1,explanation:"748×6=(700×6)+(48×6)=4200+288=4488."},
+        {id:20,q:"3⅞ − 1¼",answer:"2⅝",mark:1,explanation:"¼=²⁄₈; 3⅞−1²⁄₈=2⁵⁄₈."},
+        {id:21,q:"0.45 × 40",answer:"18",mark:1,explanation:"0.45×40=0.45×4×10=1.8×10=18."},
+        {id:22,q:"3² + 4²",answer:"25",mark:1,explanation:"3²=9; 4²=16; 9+16=25."},
+        {id:23,q:"2,736 ÷ 8",answer:"342",mark:1,explanation:"2736÷8=342. Check: 8×342=2736 ✓"},
+        {id:24,q:"35% of 200",answer:"70",mark:1,explanation:"10%=20; 35%=3×20+10=60+10=70."},
+        {id:25,q:"⅓ ÷ 3",answer:"1/9",mark:1,explanation:"⅓÷3=⅓×⅓=¹⁄₉."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A school hall has 18 rows of chairs. Each row has 24 chairs. How many chairs are there altogether?",answer:"432",mark:2,explanation:"18×24=18×20+18×4=360+72=432 chairs."},
+        {id:2,q:"Write these decimals in order, smallest first:\n1.4   0.14   1.04   0.41",answer:"0.14, 0.41, 1.04, 1.4",mark:1,explanation:"Compare place values: 0.14 < 0.41 < 1.04 < 1.4."},
+        {id:3,q:"A jug holds 2.5 litres of juice. Sam pours out 750 ml. How many millilitres remain?",answer:"1750",mark:2,explanation:"2.5 litres=2500 ml; 2500−750=1750 ml."},
+        {id:4,q:"What is the value of the digit 9 in the number 5,923,416?",answer:"900,000",mark:1,explanation:"The 9 is in the hundred-thousands column; value=900,000."},
+        {id:5,q:"A triangle has a base of 12 cm and a height of 9 cm. What is its area?",answer:"54",mark:2,explanation:"Area of triangle = ½ × base × height = ½ × 12 × 9 = 54 cm²."},
+        {id:6,q:"Round 6,452,839 to the nearest hundred thousand.",answer:"6,500,000",mark:1,explanation:"The digit after hundred-thousands is 5 (≥5), so round up: 6,500,000."},
+        {id:7,q:"Apples cost 45p each. Oranges cost £1.15 each. Priya buys 5 apples and 2 oranges. How much does she spend?",answer:"£4.55",mark:2,explanation:"5×45p=225p=£2.25; 2×£1.15=£2.30; total=£2.25+£2.30=£4.55."},
+        {id:8,q:"The temperature in Oslo is −12°C. The temperature in London is 3°C. What is the difference in temperature?",answer:"15°C",mark:1,explanation:"3−(−12)=3+12=15°C difference."},
+        {id:9,q:"A rectangle has an area of 91 cm². Its length is 13 cm. What is its width?",answer:"7 cm",mark:2,explanation:"Area = length × width; 91 = 13 × w; w = 91÷13 = 7 cm."},
+        {id:10,q:"Express 20 minutes as a fraction of 2 hours. Give your answer in its simplest form.",answer:"1/6",mark:2,explanation:"2 hours=120 minutes; 20/120=1/6."},
+        {id:11,q:"A bus departs at 08:35 and arrives at 11:10. How long is the journey?",answer:"2 hours 35 minutes",mark:2,explanation:"08:35 to 11:10: count on 2h35min. Check: 08:35+2h=10:35+35min=11:10 ✓"},
+        {id:12,q:"What percentage of 120 is 90?",answer:"75%",mark:2,explanation:"90÷120=0.75=75%."},
+        {id:13,q:"A bag of rice weighs 2.4 kg. How many 300 g portions can be made from the bag?",answer:"8",mark:2,explanation:"2.4 kg=2400 g; 2400÷300=8 portions."},
+        {id:14,q:"A map has a scale of 1:50,000. Two towns are 8 cm apart on the map. What is the actual distance in kilometres?",answer:"4 km",mark:2,explanation:"8×50,000=400,000 cm=4,000 m=4 km."},
+        {id:15,q:"The range of six numbers is 18. The smallest number is 7. Four of the other numbers are 12, 15, 20, and 24. What is the sixth number?",answer:"25",mark:2,explanation:"Range=largest−smallest=18; largest=7+18=25. Check: 24 is not the largest, so the sixth number must be 25."}
+      ]
+    }
+  },
+  {
+    year: "2023",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"847 + 356",answer:"1203",mark:1,explanation:"847+356: 7+6=13 (write 3, carry 1); 4+5+1=10 (write 0, carry 1); 8+3+1=12. Answer: 1203."},
+        {id:2,q:"3,005 − 867",answer:"2138",mark:1,explanation:"3005−867=2138. Check: 2138+867=3005 ✓"},
+        {id:3,q:"74 × 9",answer:"666",mark:1,explanation:"74×9=(70×9)+(4×9)=630+36=666."},
+        {id:4,q:"585 ÷ 5",answer:"117",mark:1,explanation:"585÷5: 5÷5=1; 8÷5=1 r3; 35÷5=7. Answer: 117."},
+        {id:5,q:"⁴⁄₉ + ²⁄₉",answer:"⅔",mark:1,explanation:"⁴⁄₉+²⁄₉=⁶⁄₉=⅔."},
+        {id:6,q:"8.3 + 5.94",answer:"14.24",mark:1,explanation:"8.30+5.94=14.24."},
+        {id:7,q:"20.5 − 8.7",answer:"11.8",mark:1,explanation:"20.5−8.7=11.8."},
+        {id:8,q:"83 × 47",answer:"3901",mark:1,explanation:"83×47=83×40+83×7=3320+581=3901."},
+        {id:9,q:"⅘ of 450",answer:"360",mark:1,explanation:"⅘ of 450: 450÷5=90; 90×4=360."},
+        {id:10,q:"11² (11 squared)",answer:"121",mark:1,explanation:"11²=11×11=121."},
+        {id:11,q:"0.7 × 0.8",answer:"0.56",mark:1,explanation:"7×8=56; two decimal places → 0.56."},
+        {id:12,q:"4,800 ÷ 6",answer:"800",mark:1,explanation:"48÷6=8; 4800÷6=800."},
+        {id:13,q:"⁷⁄₈ − ¼",answer:"⅝",mark:1,explanation:"¼=²⁄₈; ⁷⁄₈−²⁄₈=⁵⁄₈."},
+        {id:14,q:"62.4 ÷ 10",answer:"6.24",mark:1,explanation:"Divide by 10: move digits one place right → 6.24."},
+        {id:15,q:"756 ÷ 28",answer:"27",mark:1,explanation:"756÷28=27. Check: 28×27=756 ✓"},
+        {id:16,q:"75% of 480",answer:"360",mark:1,explanation:"50%=240; 25%=120; 75%=240+120=360."},
+        {id:17,q:"4½ + 2⅔",answer:"7⅙",mark:1,explanation:"½=³⁄₆; ⅔=⁴⁄₆; 4³⁄₆+2⁴⁄₆=6⁷⁄₆=7⅙."},
+        {id:18,q:"√196",answer:"14",mark:1,explanation:"√196=14 (14×14=196)."},
+        {id:19,q:"623 × 7",answer:"4361",mark:1,explanation:"623×7=(600×7)+(23×7)=4200+161=4361."},
+        {id:20,q:"5¼ − 2⅔",answer:"2⁷⁄₁₂",mark:1,explanation:"¼=³⁄₁₂; ⅔=⁸⁄₁₂; 5³⁄₁₂−2⁸⁄₁₂: borrow → 4¹⁵⁄₁₂−2⁸⁄₁₂=2⁷⁄₁₂."},
+        {id:21,q:"0.25 × 60",answer:"15",mark:1,explanation:"0.25×60=¼×60=15."},
+        {id:22,q:"2⁴ (2 to the power of 4)",answer:"16",mark:1,explanation:"2⁴=2×2×2×2=16."},
+        {id:23,q:"4,368 ÷ 14",answer:"312",mark:1,explanation:"4368÷14=312. Check: 14×312=4368 ✓"},
+        {id:24,q:"45% of 400",answer:"180",mark:1,explanation:"10%=40; 45%=4×40+20=160+20=180."},
+        {id:25,q:"⅖ ÷ 4",answer:"1/10",mark:1,explanation:"⅖÷4=⅖×¼=²⁄₂₀=¹⁄₁₀."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A baker makes 36 trays of biscuits. Each tray holds 24 biscuits. How many biscuits are there altogether?",answer:"864",mark:2,explanation:"36×24=36×20+36×4=720+144=864 biscuits."},
+        {id:2,q:"Write these fractions in order, starting with the largest:\n⅗   ½   ⁷⁄₁₀   ⅖",answer:"⁷⁄₁₀, ⅗, ½, ⅖",mark:1,explanation:"Convert to tenths: ⅗=⁶⁄₁₀, ½=⁵⁄₁₀, ⁷⁄₁₀, ⅖=⁴⁄₁₀. Order largest first: ⁷⁄₁₀, ⅗, ½, ⅖."},
+        {id:3,q:"A plank of wood is 3.6 m long. A carpenter cuts off 85 cm. How many centimetres of wood remain?",answer:"275",mark:2,explanation:"3.6 m=360 cm; 360−85=275 cm."},
+        {id:4,q:"Write the number eight million, forty thousand and seventeen in figures.",answer:"8,040,017",mark:1,explanation:"8,000,000+40,000+17=8,040,017."},
+        {id:5,q:"A parallelogram has a base of 14 cm and a perpendicular height of 8 cm. What is its area?",answer:"112",mark:2,explanation:"Area of parallelogram = base × height = 14 × 8 = 112 cm²."},
+        {id:6,q:"What is 4,736,200 rounded to the nearest ten thousand?",answer:"4,740,000",mark:1,explanation:"The digit after ten-thousands is 6 (≥5), so round up: 4,740,000."},
+        {id:7,q:"A notebook costs £2.35. A pen costs 85p. Theo buys 3 notebooks and 4 pens. What is the total cost?",answer:"£10.45",mark:2,explanation:"3×£2.35=£7.05; 4×85p=£3.40; total=£7.05+£3.40=£10.45."},
+        {id:8,q:"A submarine is at a depth of −45 m. It rises by 28 m. What is its new depth?",answer:"−17 m",mark:1,explanation:"−45+28=−17 m."},
+        {id:9,q:"A rectangle has a perimeter of 48 cm. Its width is 10 cm. What is its length?",answer:"14 cm",mark:2,explanation:"Perimeter = 2 × (length + width); 48 ÷ 2 = 24; length = 24 − 10 = 14 cm."},
+        {id:10,q:"Express 35 minutes as a percentage of 1 hour. Give your answer to 1 decimal place.",answer:"58.3%",mark:2,explanation:"35÷60×100=58.333…≈58.3%."},
+        {id:11,q:"A film starts at 19:45 and lasts 2 hours 25 minutes. What time does it end?\n(Give your answer in 24-hour clock format, e.g. 14:30)",answer:"22:10",mark:2,explanation:"19:45+2h=21:45+25min=22:10."},
+        {id:12,q:"In a class of 32 children, ⅜ are wearing glasses. How many children are wearing glasses?",answer:"12",mark:2,explanation:"⅜ of 32: 32÷8=4; 4×3=12 children."},
+        {id:13,q:"A car travels 264 km using 22 litres of petrol. How many kilometres does it travel per litre?",answer:"12 km",mark:2,explanation:"264÷22=12 km per litre."},
+        {id:14,q:"The ratio of red to blue counters in a bag is 3:5. There are 24 red counters. How many blue counters are there?",answer:"40",mark:2,explanation:"3 parts=24; 1 part=8; 5 parts=40 blue counters."},
+        {id:15,q:"The median of five numbers written in order is 17. The numbers are: 11, 14, ?, 21, 25. What is the missing number?",answer:"17",mark:2,explanation:"The median is the middle value (3rd number) when arranged in order. The missing number IS the median = 17."}
+      ]
+    }
+  },
+  {
+    year: "2022",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"693 + 487",answer:"1180",mark:1,explanation:"693+487: 3+7=10 (write 0, carry 1); 9+8+1=18 (write 8, carry 1); 6+4+1=11. Answer: 1180."},
+        {id:2,q:"4,002 − 758",answer:"3244",mark:1,explanation:"4002−758=3244. Check: 3244+758=4002 ✓"},
+        {id:3,q:"86 × 7",answer:"602",mark:1,explanation:"86×7=(80×7)+(6×7)=560+42=602."},
+        {id:4,q:"756 ÷ 9",answer:"84",mark:1,explanation:"756÷9: 72÷9=8; 36÷9=4... actually: 9×84=756 ✓"},
+        {id:5,q:"⅝ + ⅜",answer:"1",mark:1,explanation:"⅝+³⁄₈=⁸⁄₈=1."},
+        {id:6,q:"4.6 + 7.85",answer:"12.45",mark:1,explanation:"4.60+7.85=12.45."},
+        {id:7,q:"18.2 − 9.4",answer:"8.8",mark:1,explanation:"18.2−9.4=8.8."},
+        {id:8,q:"65 × 38",answer:"2470",mark:1,explanation:"65×38=65×40−65×2=2600−130=2470."},
+        {id:9,q:"⅞ of 64",answer:"56",mark:1,explanation:"⅞ of 64: 64÷8=8; 8×7=56."},
+        {id:10,q:"16² (16 squared)",answer:"256",mark:1,explanation:"16²=16×16=256."},
+        {id:11,q:"0.9 × 0.5",answer:"0.45",mark:1,explanation:"9×5=45; two decimal places → 0.45."},
+        {id:12,q:"6,300 ÷ 7",answer:"900",mark:1,explanation:"63÷7=9; 6300÷7=900."},
+        {id:13,q:"⁵⁄₆ − ⅓",answer:"½",mark:1,explanation:"⅓=²⁄₆; ⁵⁄₆−²⁄₆=³⁄₆=½."},
+        {id:14,q:"0.38 × 100",answer:"38",mark:1,explanation:"0.38×100=38."},
+        {id:15,q:"840 ÷ 35",answer:"24",mark:1,explanation:"840÷35=24. Check: 35×24=840 ✓"},
+        {id:16,q:"20% of 650",answer:"130",mark:1,explanation:"10%=65; 20%=130."},
+        {id:17,q:"3⅙ + 4⅚",answer:"8",mark:1,explanation:"3⅙+4⅚=7⁶⁄₆=7+1=8."},
+        {id:18,q:"√289",answer:"17",mark:1,explanation:"√289=17 (17×17=289)."},
+        {id:19,q:"483 × 9",answer:"4347",mark:1,explanation:"483×9=(500×9)−(17×9)=4500−153=4347."},
+        {id:20,q:"6⅓ − 2⅝",answer:"3¹⁷⁄₂₄",mark:1,explanation:"⅓=⁸⁄₂₄; ⅝=¹⁵⁄₂₄; 6⁸⁄₂₄−2¹⁵⁄₂₄: borrow → 5³²⁄₂₄−2¹⁵⁄₂₄=3¹⁷⁄₂₄."},
+        {id:21,q:"0.75 × 80",answer:"60",mark:1,explanation:"0.75×80=¾×80=60."},
+        {id:22,q:"5³ (5 cubed)",answer:"125",mark:1,explanation:"5³=5×5×5=25×5=125."},
+        {id:23,q:"3,996 ÷ 12",answer:"333",mark:1,explanation:"3996÷12=333. Check: 12×333=3996 ✓"},
+        {id:24,q:"15% of 540",answer:"81",mark:1,explanation:"10%=54; 5%=27; 15%=54+27=81."},
+        {id:25,q:"¾ ÷ 6",answer:"⅛",mark:1,explanation:"¾÷6=¾×⅙=³⁄₂₄=⅛."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A garden centre has 45 rows of plants. Each row has 36 plants. How many plants are there altogether?",answer:"1620",mark:2,explanation:"45×36=45×30+45×6=1350+270=1620 plants."},
+        {id:2,q:"Write these numbers in ascending order:\n3.06   3.6   0.36   3.006",answer:"0.36, 3.006, 3.06, 3.6",mark:1,explanation:"Compare place by place: 0.36 < 3.006 < 3.06 < 3.6."},
+        {id:3,q:"A bottle contains 1.8 litres of water. Kieran drinks 450 ml. How many millilitres are left?",answer:"1350",mark:2,explanation:"1.8 l=1800 ml; 1800−450=1350 ml."},
+        {id:4,q:"What is 3,846,200 + 400,000?",answer:"4,246,200",mark:1,explanation:"3,846,200+400,000=4,246,200."},
+        {id:5,q:"A parallelogram has a base of 12 cm and a perpendicular height of 7 cm. What is its area?",answer:"84 cm²",mark:2,explanation:"Area of parallelogram = base × height = 12 × 7 = 84 cm²."},
+        {id:6,q:"Round 7,348,512 to the nearest million.",answer:"7,000,000",mark:1,explanation:"The digit after millions is 3 (<5), so round down: 7,000,000."},
+        {id:7,q:"Tickets cost £8.50 for adults and £5.25 for children. A family buys 2 adult and 3 child tickets. What is the total cost?",answer:"£32.75",mark:2,explanation:"2×£8.50=£17.00; 3×£5.25=£15.75; total=£17.00+£15.75=£32.75."},
+        {id:8,q:"In January the temperature was −6°C. In April it was 11°C. What was the increase in temperature?",answer:"17°C",mark:1,explanation:"11−(−6)=11+6=17°C increase."},
+        {id:9,q:"A compound shape is made from two rectangles. One is 8 cm × 5 cm. The other is 3 cm × 4 cm. What is the total area?",answer:"52 cm²",mark:2,explanation:"8×5=40; 3×4=12; total=40+12=52 cm²."},
+        {id:10,q:"What is 30% of 450 as a fraction of 450? Give in simplest form.",answer:"3/10",mark:2,explanation:"30%=30/100=3/10."},
+        {id:11,q:"A library opens at 09:15 and closes at 17:45. How long is it open?",answer:"8 hours 30 minutes",mark:2,explanation:"09:15 to 17:45: 8h30min."},
+        {id:12,q:"A school has 480 pupils. ⅝ travel by bus. How many pupils travel by bus?",answer:"300",mark:2,explanation:"⅝ of 480: 480÷8=60; 60×5=300 pupils."},
+        {id:13,q:"A car uses 6.5 litres of fuel per 100 km. How much fuel is needed for a journey of 350 km?",answer:"22.75 litres",mark:2,explanation:"6.5×3.5=22.75 litres (350÷100=3.5)."},
+        {id:14,q:"The ratio of cats to dogs at a rescue centre is 4:7. There are 44 cats. How many dogs are there?",answer:"77",mark:2,explanation:"4 parts=44; 1 part=11; 7 parts=77 dogs."},
+        {id:15,q:"The mean of four numbers is 23. Three of the numbers are 18, 27 and 31. What is the fourth number?",answer:"16",mark:2,explanation:"Total=23×4=92; 18+27+31=76; fourth number=92−76=16."}
+      ]
+    }
+  },
+  {
+    year: "2019",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"456 + 279",answer:"735",mark:1,explanation:"456+279: 6+9=15 (write 5, carry 1); 5+7+1=13 (write 3, carry 1); 4+2+1=7. Answer: 735."},
+        {id:2,q:"803 − 347",answer:"456",mark:1,explanation:"803−347=456. Check: 456+347=803 ✓"},
+        {id:3,q:"57 × 6",answer:"342",mark:1,explanation:"57×6=(50×6)+(7×6)=300+42=342."},
+        {id:4,q:"364 ÷ 7",answer:"52",mark:1,explanation:"364÷7: 35÷7=5; 14÷7=2. Answer: 52."},
+        {id:5,q:"⅓ + ½",answer:"⅚",mark:1,explanation:"Common denominator 6: ²⁄₆+³⁄₆=⁵⁄₆."},
+        {id:6,q:"5.7 + 2.46",answer:"8.16",mark:1,explanation:"5.70+2.46=8.16."},
+        {id:7,q:"9.1 − 3.8",answer:"5.3",mark:1,explanation:"9.1−3.8=5.3."},
+        {id:8,q:"72 × 45",answer:"3240",mark:1,explanation:"72×45=72×40+72×5=2880+360=3240."},
+        {id:9,q:"⅗ of 300",answer:"180",mark:1,explanation:"⅗ of 300: 300÷5=60; 60×3=180."},
+        {id:10,q:"14² (14 squared)",answer:"196",mark:1,explanation:"14²=14×14=196."},
+        {id:11,q:"0.3 × 0.9",answer:"0.27",mark:1,explanation:"3×9=27; two decimal places → 0.27."},
+        {id:12,q:"3,600 ÷ 4",answer:"900",mark:1,explanation:"36÷4=9; 3600÷4=900."},
+        {id:13,q:"⅔ − ¼",answer:"⁵⁄₁₂",mark:1,explanation:"Common denom 12: ⁸⁄₁₂−³⁄₁₂=⁵⁄₁₂."},
+        {id:14,q:"0.06 × 1000",answer:"60",mark:1,explanation:"0.06×1000=60."},
+        {id:15,q:"504 ÷ 18",answer:"28",mark:1,explanation:"504÷18=28. Check: 18×28=504 ✓"},
+        {id:16,q:"30% of 280",answer:"84",mark:1,explanation:"10%=28; 30%=3×28=84."},
+        {id:17,q:"1⅘ + 3⅖",answer:"5⅕",mark:1,explanation:"⅘=4/5; 3⅖: 1⁴⁄₅+3²⁄₅=4⁶⁄₅=5⅕."},
+        {id:18,q:"√324",answer:"18",mark:1,explanation:"√324=18 (18×18=324)."},
+        {id:19,q:"427 × 8",answer:"3416",mark:1,explanation:"427×8=(400×8)+(27×8)=3200+216=3416."},
+        {id:20,q:"4⅙ − 1¾",answer:"2⁵⁄₁₂",mark:1,explanation:"¼=³⁄₁₂ not right. ⅙=²⁄₁₂; ¾=⁹⁄₁₂; 4²⁄₁₂−1⁹⁄₁₂=3¹⁴⁄₁₂−1⁹⁄₁₂=2⁵⁄₁₂."},
+        {id:21,q:"0.8 × 70",answer:"56",mark:1,explanation:"0.8×70=8×7=56."},
+        {id:22,q:"3³ (3 cubed)",answer:"27",mark:1,explanation:"3³=3×3×3=27."},
+        {id:23,q:"5,148 ÷ 12",answer:"429",mark:1,explanation:"5148÷12=429. Check: 12×429=5148 ✓"},
+        {id:24,q:"55% of 200",answer:"110",mark:1,explanation:"50%=100; 5%=10; 55%=110."},
+        {id:25,q:"⅚ ÷ 5",answer:"⅙",mark:1,explanation:"⅚÷5=⅚×⅕=⁵⁄₃₀=⅙."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A factory produces 48 boxes per hour. How many boxes does it produce in 35 hours?",answer:"1680",mark:2,explanation:"48×35=48×30+48×5=1440+240=1680 boxes."},
+        {id:2,q:"Write these numbers in descending order:\n2.8   2.08   2.88   0.28",answer:"2.88, 2.8, 2.08, 0.28",mark:1,explanation:"2.88 > 2.8 > 2.08 > 0.28."},
+        {id:3,q:"A bag weighs 5.2 kg when full and 0.85 kg when empty. How heavy are the contents in grams?",answer:"4350",mark:2,explanation:"5.2−0.85=4.35 kg=4350 g."},
+        {id:4,q:"What is the sum of 2,486,000 and 350,000?",answer:"2,836,000",mark:1,explanation:"2,486,000+350,000=2,836,000."},
+        {id:5,q:"A field is shaped like a trapezium with parallel sides of 30 m and 20 m, and a perpendicular height of 15 m. What is its area?",answer:"375 m²",mark:2,explanation:"Area=½×(a+b)×h=½×(30+20)×15=½×50×15=375 m²."},
+        {id:6,q:"Round 5,749,832 to the nearest thousand.",answer:"5,750,000",mark:1,explanation:"The digit after thousands is 8 (≥5), so round up: 5,750,000."},
+        {id:7,q:"A café sells coffee for £2.80 and tea for £1.95. On Tuesday they sell 15 coffees and 22 teas. What is the total income?",answer:"£84.90",mark:2,explanation:"15×£2.80=£42.00; 22×£1.95=£42.90; total=£84.90."},
+        {id:8,q:"A fish is at −12 m below sea level. A bird is flying at 35 m above sea level. What is the distance between them?",answer:"47 m",mark:1,explanation:"35−(−12)=35+12=47 m."},
+        {id:9,q:"A cube has edges of 6 cm. What is its volume?",answer:"216 cm³",mark:2,explanation:"Volume=6×6×6=216 cm³."},
+        {id:10,q:"Write 0.35 as a fraction in its simplest form.",answer:"7/20",mark:2,explanation:"0.35=35/100=7/20."},
+        {id:11,q:"A match starts at 14:50 and lasts 1 hour 45 minutes. What time does it end?\n(Give your answer in 24-hour clock format, e.g. 14:30)",answer:"16:35",mark:2,explanation:"14:50+1h=15:50+45min=16:35."},
+        {id:12,q:"A garden has 360 flowers. 45% are red. How many flowers are NOT red?",answer:"198",mark:2,explanation:"45% red=0.45×360=162; not red=360−162=198."},
+        {id:13,q:"Sanjay earns £18.50 per hour. One week he works 37 hours. What is his total pay?",answer:"£684.50",mark:2,explanation:"18.50×37=18.50×30+18.50×7=555+129.50=£684.50."},
+        {id:14,q:"Orange squash is mixed with water in the ratio 1:6. How much water is needed for 350 ml of squash?",answer:"2100 ml",mark:2,explanation:"1 part=350 ml; 6 parts=6×350=2100 ml water."},
+        {id:15,q:"The mode of a set of numbers is 8. The numbers are: 5, 8, 11, 8, 6, ?, 8. The mean is 8. What is the missing number?",answer:"10",mark:2,explanation:"Mean=8; total=8×7=56; 5+8+11+8+6+8=46; missing=56−46=10."}
+      ]
+    }
+  },
+  {
+    year: "2018",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"328 + 457",answer:"785",mark:1,explanation:"328+457: 8+7=15 (write 5, carry 1); 2+5+1=8; 3+4=7. Answer: 785."},
+        {id:2,q:"1,500 − 684",answer:"816",mark:1,explanation:"1500−684=816. Check: 816+684=1500 ✓"},
+        {id:3,q:"45 × 9",answer:"405",mark:1,explanation:"45×9=(40×9)+(5×9)=360+45=405."},
+        {id:4,q:"648 ÷ 8",answer:"81",mark:1,explanation:"648÷8: 64÷8=8; 8÷8=1. Answer: 81."},
+        {id:5,q:"¼ + ⅓",answer:"7/12",mark:1,explanation:"Common denom 12: ³⁄₁₂+⁴⁄₁₂=⁷⁄₁₂."},
+        {id:6,q:"6.4 + 8.73",answer:"15.13",mark:1,explanation:"6.40+8.73=15.13."},
+        {id:7,q:"14.6 − 5.9",answer:"8.7",mark:1,explanation:"14.6−5.9=8.7."},
+        {id:8,q:"54 × 62",answer:"3348",mark:1,explanation:"54×62=54×60+54×2=3240+108=3348."},
+        {id:9,q:"⁵⁄₉ of 63",answer:"35",mark:1,explanation:"⁵⁄₉ of 63: 63÷9=7; 7×5=35."},
+        {id:10,q:"9² (9 squared)",answer:"81",mark:1,explanation:"9²=9×9=81."},
+        {id:11,q:"0.4 × 0.7",answer:"0.28",mark:1,explanation:"4×7=28; two decimal places → 0.28."},
+        {id:12,q:"2,700 ÷ 9",answer:"300",mark:1,explanation:"27÷9=3; 2700÷9=300."},
+        {id:13,q:"⁷⁄₁₀ − ⅖",answer:"3/10",mark:1,explanation:"⅖=⁴⁄₁₀; ⁷⁄₁₀−⁴⁄₁₀=³⁄₁₀."},
+        {id:14,q:"52.6 ÷ 100",answer:"0.526",mark:1,explanation:"Divide by 100: move digits two places right → 0.526."},
+        {id:15,q:"392 ÷ 14",answer:"28",mark:1,explanation:"392÷14=28. Check: 14×28=392 ✓"},
+        {id:16,q:"10% of 470",answer:"47",mark:1,explanation:"10% means divide by 10: 470÷10=47."},
+        {id:17,q:"2⅜ + 1¾",answer:"4⅛",mark:1,explanation:"¾=⁶⁄₈; 2³⁄₈+1⁶⁄₈=3⁹⁄₈=4⅛."},
+        {id:18,q:"√400",answer:"20",mark:1,explanation:"√400=20 (20×20=400)."},
+        {id:19,q:"364 × 7",answer:"2548",mark:1,explanation:"364×7=(300×7)+(64×7)=2100+448=2548."},
+        {id:20,q:"5½ − 2⅔",answer:"2⅚",mark:1,explanation:"½=³⁄₆; ⅔=⁴⁄₆; 5³⁄₆−2⁴⁄₆: borrow → 4⁹⁄₆−2⁴⁄₆=2⁵⁄₆."},
+        {id:21,q:"0.6 × 50",answer:"30",mark:1,explanation:"0.6×50=6×5=30."},
+        {id:22,q:"4² − 3²",answer:"7",mark:1,explanation:"16−9=7."},
+        {id:23,q:"2,856 ÷ 8",answer:"357",mark:1,explanation:"2856÷8=357. Check: 8×357=2856 ✓"},
+        {id:24,q:"80% of 150",answer:"120",mark:1,explanation:"10%=15; 80%=8×15=120."},
+        {id:25,q:"¾ ÷ 9",answer:"1/12",mark:1,explanation:"¾÷9=¾×⅑=³⁄₃₆=¹⁄₁₂."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A farmer has 56 fields. Each field has 38 sheep. How many sheep are there altogether?",answer:"2128",mark:2,explanation:"56×38=56×40−56×2=2240−112=2128 sheep."},
+        {id:2,q:"Circle all the prime numbers:\n17   21   29   33   41   49",answer:"17, 29, 41",mark:1,explanation:"17, 29 and 41 are prime (only divisible by 1 and themselves). 21=3×7; 33=3×11; 49=7×7."},
+        {id:3,q:"A barrel holds 45.6 litres of oil. A truck has 8 barrels. How many litres of oil does the truck carry?",answer:"364.8",mark:2,explanation:"45.6×8=364.8 litres."},
+        {id:4,q:"What is 3,000,000 − 450,000?",answer:"2,550,000",mark:1,explanation:"3,000,000−450,000=2,550,000."},
+        {id:5,q:"A shape is made from two rectangles. One is 9 cm × 4 cm and the other is 6 cm × 3 cm. What is the total area?",answer:"54 cm²",mark:2,explanation:"9 × 4 = 36 cm²; 6 × 3 = 18 cm²; total = 36 + 18 = 54 cm²."},
+        {id:6,q:"What is 8,035,700 rounded to the nearest ten thousand?",answer:"8,040,000",mark:1,explanation:"The digit after ten-thousands is 5 (≥5), so round up: 8,040,000."},
+        {id:7,q:"Train tickets cost £34.50 for adults and £18.75 for children. A family buys 2 adults and 3 children tickets. What is the total cost?",answer:"£125.25",mark:2,explanation:"2×£34.50=£69.00; 3×£18.75=£56.25; total=£125.25."},
+        {id:8,q:"The freezer temperature is −18°C. The oven is 220°C. What is the difference?",answer:"238°C",mark:1,explanation:"220−(−18)=220+18=238°C."},
+        {id:9,q:"A cuboid measures 8 cm × 5 cm × 3 cm. What is its volume?",answer:"120 cm³",mark:2,explanation:"V=8×5×3=120 cm³."},
+        {id:10,q:"What is 0.6 written as a percentage and as a fraction in its simplest form?",answer:"60%, 3/5",mark:2,explanation:"0.6=60%=⁶⁄₁₀=³⁄₅."},
+        {id:11,q:"A shop opens at 08:45 and closes at 18:20. How long is it open each day?",answer:"9 hours 35 minutes",mark:2,explanation:"08:45 to 18:20: 9h35min."},
+        {id:12,q:"There are 840 people at a concert. ⅜ are male. How many females are there?",answer:"525",mark:2,explanation:"⅜ male=840÷8×3=315 male; female=840−315=525."},
+        {id:13,q:"A recipe uses 350 g of flour for every 200 g of sugar. How much flour is needed for 500 g of sugar?",answer:"875 g",mark:2,explanation:"Ratio 350:200=7:4. For 500 g sugar: 500÷4×7=875 g flour."},
+        {id:14,q:"The angles in a triangle are in the ratio 2:3:4. What is the size of the largest angle?",answer:"80°",mark:2,explanation:"Total parts=9; 180÷9=20°; largest=4×20=80°."},
+        {id:15,q:"A number is multiplied by 6, then 15 is added. The result is 99. What is the original number?",answer:"14",mark:2,explanation:"(n×6)+15=99; 6n=84; n=14."}
+      ]
+    }
+  },
+  {
+    year: "2017",
+    paper1: {
+      title: "Paper 1: Arithmetic",
+      time: 30*60,
+      instructions: "This paper tests your arithmetic skills. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"243 + 368",answer:"611",mark:1,explanation:"243+368: 3+8=11 (write 1, carry 1); 4+6+1=11 (write 1, carry 1); 2+3+1=6. Answer: 611."},
+        {id:2,q:"700 − 283",answer:"417",mark:1,explanation:"700−283=417. Check: 417+283=700 ✓"},
+        {id:3,q:"38 × 6",answer:"228",mark:1,explanation:"38×6=(30×6)+(8×6)=180+48=228."},
+        {id:4,q:"495 ÷ 5",answer:"99",mark:1,explanation:"495÷5=99. Check: 5×99=495 ✓"},
+        {id:5,q:"⅕ + ⅖",answer:"⅗",mark:1,explanation:"⅕+²⁄₅=³⁄₅."},
+        {id:6,q:"3.5 + 6.48",answer:"9.98",mark:1,explanation:"3.50+6.48=9.98."},
+        {id:7,q:"11.4 − 4.6",answer:"6.8",mark:1,explanation:"11.4−4.6=6.8."},
+        {id:8,q:"36 × 54",answer:"1944",mark:1,explanation:"36×54=36×50+36×4=1800+144=1944."},
+        {id:9,q:"⅔ of 180",answer:"120",mark:1,explanation:"⅔ of 180: 180÷3=60; 60×2=120."},
+        {id:10,q:"12² (12 squared)",answer:"144",mark:1,explanation:"12²=12×12=144."},
+        {id:11,q:"0.8 × 0.6",answer:"0.48",mark:1,explanation:"8×6=48; two decimal places → 0.48."},
+        {id:12,q:"4,500 ÷ 9",answer:"500",mark:1,explanation:"45÷9=5; 4500÷9=500."},
+        {id:13,q:"⅘ − ⅗",answer:"⅕",mark:1,explanation:"⅘−³⁄₅=¹⁄₅."},
+        {id:14,q:"0.74 × 10",answer:"7.4",mark:1,explanation:"0.74×10=7.4."},
+        {id:15,q:"693 ÷ 21",answer:"33",mark:1,explanation:"693÷21=33. Check: 21×33=693 ✓"},
+        {id:16,q:"50% of 370",answer:"185",mark:1,explanation:"50%=370÷2=185."},
+        {id:17,q:"1⅜ + 2⅝",answer:"4",mark:1,explanation:"1³⁄₈+2⁵⁄₈=3⁸⁄₈=4."},
+        {id:18,q:"√169",answer:"13",mark:1,explanation:"√169=13 (13×13=169)."},
+        {id:19,q:"538 × 4",answer:"2152",mark:1,explanation:"538×4=(500×4)+(38×4)=2000+152=2152."},
+        {id:20,q:"7⅓ − 4⅚",answer:"2½",mark:1,explanation:"⅓=²⁄₆; 7²⁄₆−4⁵⁄₆: borrow → 6⁸⁄₆−4⁵⁄₆=2³⁄₆=2½."},
+        {id:21,q:"0.5 × 90",answer:"45",mark:1,explanation:"0.5×90=½×90=45."},
+        {id:22,q:"2⁵ (2 to the power 5)",answer:"32",mark:1,explanation:"2⁵=2×2×2×2×2=32."},
+        {id:23,q:"3,024 ÷ 9",answer:"336",mark:1,explanation:"3024÷9=336. Check: 9×336=3024 ✓"},
+        {id:24,q:"70% of 340",answer:"238",mark:1,explanation:"10%=34; 70%=7×34=238."},
+        {id:25,q:"⅔ ÷ 4",answer:"⅙",mark:1,explanation:"⅔÷4=⅔×¼=²⁄₁₂=⅙."}
+      ]
+    },
+    paper2: {
+      title: "Paper 2: Reasoning",
+      time: 40*60,
+      instructions: "Read each question carefully. Show your working. You may NOT use a calculator.",
+      questions: [
+        {id:1,q:"A warehouse stores boxes in stacks of 26. There are 34 stacks. How many boxes are in the warehouse?",answer:"884",mark:2,explanation:"26×34=26×30+26×4=780+104=884 boxes."},
+        {id:2,q:"Write these fractions as decimals:\n¾   ⅖   ⅞",answer:"0.75, 0.4, 0.875",mark:1,explanation:"¾=0.75; ⅖=0.4; ⅞=0.875."},
+        {id:3,q:"A bucket holds 9.6 litres. How much water in millilitres do 7 buckets hold?",answer:"67200",mark:2,explanation:"9.6×7=67.2 litres=67,200 ml."},
+        {id:4,q:"What is the product of 1,400 and 300?",answer:"420,000",mark:1,explanation:"1400×300=1400×3×100=4200×100=420,000."},
+        {id:5,q:"A triangle has a base of 14 cm and a perpendicular height of 9 cm. What is its area?",answer:"63 cm²",mark:2,explanation:"Area of triangle = ½ × base × height = ½ × 14 × 9 = 63 cm²."},
+        {id:6,q:"Round 4,562,890 to the nearest hundred.",answer:"4,562,900",mark:1,explanation:"The digit after hundreds is 9 (≥5), so round up: 4,562,900."},
+        {id:7,q:"Market stall: 3 scarves for £14.70. Tara buys 7 scarves. How much does she pay?",answer:"£34.30",mark:2,explanation:"Price per scarf=£14.70÷3=£4.90; 7×£4.90=£34.30."},
+        {id:8,q:"Write all integers between −5 and 3 (not including −5 and 3).",answer:"−4, −3, −2, −1, 0, 1, 2",mark:1,explanation:"All whole numbers strictly between −5 and 3: −4, −3, −2, −1, 0, 1, 2."},
+        {id:9,q:"A cuboid has a length of 8 cm, a width of 5 cm and a height of 3 cm. What is its volume?",answer:"120 cm³",mark:2,explanation:"Volume = length × width × height = 8 × 5 × 3 = 120 cm³."},
+        {id:10,q:"What is ¼ written as a decimal and as a percentage?",answer:"0.25 and 25%",mark:2,explanation:"¼=0.25=25%."},
+        {id:11,q:"A digital clock shows 09:47. What time will it show 4 hours and 38 minutes later?\n(Give your answer in 24-hour clock format, e.g. 14:30)",answer:"14:25",mark:2,explanation:"09:47+4h=13:47+38min=14:25."},
+        {id:12,q:"A school collected £840 for charity. They gave ⅝ to one charity and the rest to another. How much went to each charity?",answer:"£525 and £315",mark:2,explanation:"⅝ of 840=840÷8×5=525; remainder=840−525=315."},
+        {id:13,q:"A car depreciates in value by 15% each year. It was worth £12,000. What is it worth after 1 year?",answer:"£10,200",mark:2,explanation:"15% of 12,000=1,800; 12,000−1,800=£10,200."},
+        {id:14,q:"Two numbers have a sum of 100 and a difference of 24. What are the two numbers?",answer:"62 and 38",mark:2,explanation:"(100+24)÷2=62; (100−24)÷2=38. Check: 62+38=100; 62−38=24 ✓"},
+        {id:15,q:"The mean mass of 5 parcels is 2.4 kg. A sixth parcel of 3.6 kg is added. What is the new mean mass?",answer:"2.6 kg",mark:2,explanation:"Total of 5=5×2.4=12 kg; new total=12+3.6=15.6 kg; new mean=15.6÷6=2.6 kg."}
+      ]
+    }
+  }
+];
+
+// Export for use in other files
+if (typeof window !== 'undefined') window.MATHS_SETS = MATHS_SETS;
