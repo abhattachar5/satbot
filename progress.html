@@ -833,7 +833,7 @@ function renderSubjects(breakdown) {
   var cards = breakdown.map(function(b) {
     var s = S(b.subject);
     var t = trendMap[b.trend] || trendMap.insufficient_data;
-    var pct = b.attemptCount > 0 ? b.averagePercent + '%' : '—';
+    var pct = b.scoredCount > 0 ? b.averagePercent + '%' : '—';
     return [
       '<div class="card card-' + s.cls + '">',
       '  <div class="card-icon icon-' + s.cls + '">' + s.icon + '</div>',
@@ -913,15 +913,16 @@ function renderActivity(recent) {
 
   var cards = recent.map(function(a) {
     var s = S(a.subject);
-    var pct = a.maxScore > 0 ? Math.round(a.score / a.maxScore * 100) : 0;
+    var scored = a.maxScore > 0;
+    var pct = scored ? Math.round(a.score / a.maxScore * 100) : 0;
     return [
       '<div class="activity-card" role="listitem">',
       '  <div class="activity-card-header">',
       '    <span class="activity-dot" style="background:' + s.color + '"></span>',
       '    <span class="activity-paper">' + esc(a.paperCode) + '</span>',
       '  </div>',
-      '  <div class="activity-score">' + a.score + ' / ' + a.maxScore + '</div>',
-      '  <div class="activity-pct">' + pct + '%</div>',
+      '  <div class="activity-score">' + (scored ? a.score + ' / ' + a.maxScore : 'Not marked') + '</div>',
+      '  <div class="activity-pct">' + (scored ? pct + '%' : '&nbsp;') + '</div>',
       '  <div class="activity-meta">' + (a.durationSeconds ? '⏱ ' + fmtMins(a.durationSeconds) + '<br>' : '') + fmtDate(a.completedAt) + '</div>',
       '</div>'
     ].join('\n');

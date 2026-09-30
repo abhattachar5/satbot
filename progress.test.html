@@ -480,7 +480,7 @@ describe('exportAll → resetAll → importAll round-trip', () => {
   it('importAll restores all attempts losslessly', async () => {
     const s = makeStore();
     await s.recordAttempt(sampleAttempt({ score: 35, maxScore: 40, paperCode: 'unique-paper' }));
-    await s.recordAttempt(sampleAttempt({ subject: 'reading', score: 28, maxScore: 35 }));
+    await s.recordAttempt({ ...sampleAttempt({ subject: 'reading', score: 28, maxScore: 35 }), selfMarked: true });
     await s.evaluateAchievements();
 
     const exported = await s.exportAll();
@@ -559,6 +559,51 @@ describe('Preferences', () => {
     assertEqual(prefs.displayName,      'Alex', 'displayName updated');
     assertEqual(prefs.yearGroup,        'Y6',   'yearGroup unchanged');
     assertEqual(prefs.weeklyGoalPapers, 3,      'weeklyGoalPapers unchanged');
+  });
+});
+
+describe('Unscored reading attempts', () => {
+  const { retireLegacyReadingScores, computeTrend } = ProgressStore._helpers;
+
+  it('retires legacy reading scores but keeps self-marked ones', () => {
+    const store = { attempts: [
+      sampleAttempt({ subject: 'reading', score: 14, maxScore: 15 }),
+      { ...sampleAttempt({ subject: 'reading', score: 12, maxScore: 21 }), selfMarked: true },
+      sampleAttempt({ subject: 'maths', score: 30, maxScore: 40 })
+    ] };
+    assertTrue(retireLegacyReadingScores(store), 'reports a change');
+    assertEqual(store.attempts[0].maxScore, 0, 'legacy reading unscored');
+    assertTrue(store.attempts[0].legacyUnscored, 'legacy flag set');
+    assertEqual(store.attempts[1].maxScore, 21, 'self-marked reading kept');
+    assertEqual(store.attempts[2].maxScore, 40, 'maths untouched');
+    assertFalse(retireLegacyReadingScores(store), 'idempotent');
+  });
+
+  it('recordAttempt persists the selfMarked flag', async () => {
+    const s = makeStore();
+    const saved = await s.recordAttempt({ ...sampleAttempt({ subject: 'reading' }), selfMarked: true });
+    assertTrue(saved.selfMarked, 'selfMarked stored');
+  });
+
+  it('importAll retires legacy reading scores', async () => {
+    const s = makeStore();
+    await s.recordAttempt(sampleAttempt({ subject: 'reading', score: 15, maxScore: 15 }));
+    const exported = await s.exportAll();
+    await s.resetAll();
+    await s.importAll(exported);
+    const summary = await s.getSummary();
+    assertEqual(summary.totalAttempts, 1, 'attempt kept');
+    assertEqual(summary.overallAveragePercent, null, 'excluded from average');
+    const [reading] = (await s.getSubjectBreakdown()).filter(b => b.subject === 'reading');
+    assertEqual(reading.attemptCount, 1, 'attemptCount');
+    assertEqual(reading.scoredCount, 0, 'scoredCount');
+  });
+
+  it('computeTrend ignores unscored attempts', () => {
+    const scored = [50, 50, 50, 50].map(p => ({ score: p, maxScore: 100 }));
+    const unscored = [{ score: 15, maxScore: 0 }, { score: 15, maxScore: 0 }, { score: 15, maxScore: 0 }];
+    assertEqual(computeTrend([...scored, ...unscored]), 'flat', 'zero-max attempts not counted as 0%');
+    assertEqual(computeTrend(unscored), 'insufficient_data', 'no scored attempts');
   });
 });
 

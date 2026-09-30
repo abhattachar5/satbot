@@ -131,42 +131,83 @@ function TextPanel({ set, activeText, setActiveText }) {
   );
 }
 
+function MarkPicker({ q, value, locked, onChange }) {
+  const opts = Array.from({length:q.mark+1},(_,i)=>i);
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:'.4rem',flexWrap:'wrap',marginTop:'.6rem'}}>
+      <span style={{fontSize:'.78rem',fontWeight:600,color:'#374151'}}>{locked?'No answer — 0 marks':'Marks you earned:'}</span>
+      {!locked && opts.map(n=>(
+        <button key={n} type="button" aria-pressed={value===n} aria-label={`${n} mark${n!==1?'s':''} for question ${q.id}`}
+          style={{minWidth:'2.2rem',padding:'.3rem .6rem',borderRadius:'8px',cursor:'pointer',fontFamily:"'DM Sans',sans-serif",fontWeight:700,fontSize:'.82rem',
+                  border:`1.5px solid ${value===n?'#1a2e5a':'#e5e4e0'}`,background:value===n?'#1a2e5a':'#fff',color:value===n?'#fff':'#1a2e5a'}}
+          onClick={()=>onChange(n)}>{n}</button>
+      ))}
+    </div>
+  );
+}
+
 function Results({ set, answers, onRetry, onBack }) {
   const qs = set.questions;
   const totalMarks = qs.reduce((a,q)=>a+q.mark,0);
-  const attempted = qs.filter(q => (answers[q.id]||'').trim().length>2).length;
-  const pct = Math.round((attempted/qs.length)*100);
+  const isBlank = q => !(answers[q.id]||'').trim();
+  // Blank answers score 0 automatically; everything else is marked by the child.
+  const [marks, setMarks] = useState(() => Object.fromEntries(qs.filter(isBlank).map(q=>[q.id,0])));
+  const [saved, setSaved] = useState(false);
+  const markedCount = qs.filter(q=>marks[q.id]!==undefined).length;
+  const allMarked = markedCount===qs.length;
+  const earned = qs.reduce((a,q)=>a+(marks[q.id]||0),0);
+  const pct = Math.round((earned/totalMarks)*100);
   const barColor = pct>=75?'#059669':pct>=50?'#f59e0b':'#dc2626';
-  const band = pct>=100?'All questions attempted — self-mark below!':pct>=75?'Most questions attempted — check the ones you skipped':pct>=50?'Getting there — try to answer every question':'Keep going — attempt every question, even if unsure';
+  const band = pct>=85?'Excellent!':pct>=70?'Good — at expected standard':pct>=50?'Getting there — keep practising':'Keep going — read the model answers below';
 
-  useEffect(() => {
+  function saveScore() {
+    if (saved || !allMarked) return;
+    setSaved(true);
     const store = new ProgressStore();
     store.recordAttempt({
       paperCode: 'reading-' + set.year,
       subject: 'reading',
-      score: attempted,
-      maxScore: qs.length,
+      score: earned,
+      maxScore: totalMarks,
+      selfMarked: true,
       completedAt: new Date().toISOString(),
       questionResults: qs.map(q => ({
         qId: 'reading-q' + q.id,
         topic: null,
-        correct: (answers[q.id]||'').trim().length > 2
+        correct: marks[q.id] === q.mark
       }))
     }).then(() => store.evaluateAchievements());
-  }, []);
+  }
+
+  const cardColors = q => {
+    const m = marks[q.id];
+    if (m===undefined) return ['#fff','#e5e4e0'];
+    if (m===q.mark) return ['#f0fdf4','#059669'];
+    if (m>0) return ['#fffbeb','#f59e0b'];
+    return ['#fef2f2','#dc2626'];
+  };
 
   return (
     <div style={{maxWidth:'740px',margin:'0 auto',padding:'2.5rem 1.5rem 5rem'}}>
       <div style={{background:'#fff',border:'1.5px solid #e5e4e0',borderRadius:'16px',padding:'2.5rem',textAlign:'center',marginBottom:'2rem',boxShadow:'0 2px 12px rgba(26,46,90,.08)'}}>
-        <div style={{fontSize:'4rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.04em'}}>{attempted}<span style={{fontSize:'2rem',color:'#6b7280'}}>/{qs.length}</span></div>
-        <div style={{color:'#6b7280',marginTop:'.4rem'}}>questions attempted · {totalMarks} marks available · Reading {set.year}</div>
-        <div style={{height:'10px',background:'#f3f2ef',borderRadius:'100px',margin:'1.5rem 0',overflow:'hidden'}}>
-          <div style={{height:'100%',borderRadius:'100px',background:barColor,width:pct+'%',transition:'width 1s'}}></div>
-        </div>
-        <div style={{fontWeight:600,color:barColor}}>{band}</div>
+        {saved ? <>
+          <div style={{fontSize:'4rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.04em'}}>{earned}<span style={{fontSize:'2rem',color:'#6b7280'}}>/{totalMarks}</span></div>
+          <div style={{color:'#6b7280',marginTop:'.4rem'}}>{pct}% · Reading {set.year} · self-marked</div>
+          <div style={{height:'10px',background:'#f3f2ef',borderRadius:'100px',margin:'1.5rem 0',overflow:'hidden'}}>
+            <div style={{height:'100%',borderRadius:'100px',background:barColor,width:pct+'%',transition:'width 1s'}}></div>
+          </div>
+          <div style={{fontWeight:600,color:barColor}}>{band}</div>
+          <div style={{fontSize:'.8rem',color:'#6b7280',marginTop:'.75rem'}}>✓ Saved to <a href="progress.html" style={{color:'#1a2e5a',fontWeight:600}}>My Progress</a></div>
+        </> : <>
+          <div style={{fontSize:'1.6rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.02em'}}>Now mark your answers</div>
+          <div style={{color:'#6b7280',marginTop:'.5rem',lineHeight:1.55}}>Compare each answer with the model answer and choose how many marks you earned. {markedCount} of {qs.length} questions marked.</div>
+          <div style={{height:'10px',background:'#f3f2ef',borderRadius:'100px',margin:'1.5rem 0 0',overflow:'hidden'}}>
+            <div style={{height:'100%',borderRadius:'100px',background:'#059669',width:Math.round(markedCount/qs.length*100)+'%',transition:'width .3s'}}></div>
+          </div>
+        </>}
       </div>
       <div style={{fontSize:'.85rem',color:'#6b7280',marginBottom:'1.5rem',lineHeight:1.55,background:'#f3f2ef',padding:'1rem',borderRadius:'8px'}}>
-        ℹ️ Reading comprehension allows a range of valid answers. Compare your answer with the model answer — if you made a similar point with evidence, give yourself credit!
+        ℹ️ Reading comprehension allows a range of valid answers. If you made a similar point to the model answer, with evidence where the question asks for it, give yourself the marks!
       </div>
       {[1,2,0].map(textNum => {
         const filtered = qs.filter(q=>q.text===textNum);
@@ -174,20 +215,28 @@ function Results({ set, answers, onRetry, onBack }) {
         return (
           <div key={textNum}>
             <div style={{fontSize:'.7rem',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'#6b7280',marginTop:'1.5rem',marginBottom:'.75rem'}}>{sLabel}</div>
-            {filtered.map(q => (
-              <div key={q.id} style={{background:(answers[q.id]||'').trim().length>2?'#f0fdf4':'#fef2f2',border:`1.5px solid ${(answers[q.id]||'').trim().length>2?'#059669':'#dc2626'}`,borderRadius:'10px',padding:'1.25rem',marginBottom:'.75rem'}}>
-                <div style={{fontSize:'.72rem',fontWeight:600,color:'#6b7280',marginBottom:'.3rem'}}>Q{q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
-                <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.4rem',lineHeight:1.5}}>{q.q}</div>
-                <div style={{fontSize:'.82rem',fontWeight:600,color:'#374151',marginBottom:'.2rem'}}>Your answer: <span style={{fontWeight:400}}>{answers[q.id]||'(no answer)'}</span></div>
-                <div style={{fontSize:'.82rem',fontWeight:600,color:'#059669',marginBottom:'.3rem'}}>Model answer: <span style={{fontWeight:400}}>{q.answer}</span></div>
-                <div style={{fontSize:'.82rem',color:'#374151',lineHeight:1.6,borderTop:'1px solid rgba(0,0,0,.07)',paddingTop:'.4rem',marginTop:'.3rem'}}>💡 {q.explanation}</div>
-              </div>
-            ))}
+            {filtered.map(q => {
+              const [bg,border] = cardColors(q);
+              return (
+                <div key={q.id} style={{background:bg,border:`1.5px solid ${border}`,borderRadius:'10px',padding:'1.25rem',marginBottom:'.75rem'}}>
+                  <div style={{fontSize:'.72rem',fontWeight:600,color:'#6b7280',marginBottom:'.3rem'}}>Q{q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
+                  <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.4rem',lineHeight:1.5}}>{q.q}</div>
+                  <div style={{fontSize:'.82rem',fontWeight:600,color:'#374151',marginBottom:'.2rem'}}>Your answer: <span style={{fontWeight:400}}>{answers[q.id]||'(no answer)'}</span></div>
+                  <div style={{fontSize:'.82rem',fontWeight:600,color:'#059669',marginBottom:'.3rem'}}>Model answer: <span style={{fontWeight:400}}>{q.answer}</span></div>
+                  <div style={{fontSize:'.82rem',color:'#374151',lineHeight:1.6,borderTop:'1px solid rgba(0,0,0,.07)',paddingTop:'.4rem',marginTop:'.3rem'}}>💡 {q.explanation}</div>
+                  {saved
+                    ? <div style={{fontSize:'.82rem',fontWeight:700,color:border,marginTop:'.6rem'}}>{marks[q.id]} / {q.mark} mark{q.mark>1?'s':''}</div>
+                    : <MarkPicker q={q} value={marks[q.id]} locked={isBlank(q)} onChange={n=>setMarks(p=>({...p,[q.id]:n}))}/>}
+                </div>
+              );
+            })}
           </div>
         );
       })}
-      <div style={{marginTop:'2rem',display:'flex',gap:'.75rem',flexWrap:'wrap'}}>
-        <button style={RS.btnSubmit} onClick={onRetry}>↩ Try again</button>
+      <div style={{marginTop:'2rem',display:'flex',gap:'.75rem',flexWrap:'wrap',alignItems:'center'}}>
+        {!saved && <button style={{...RS.btnSubmit,opacity:allMarked?1:.5,cursor:allMarked?'pointer':'not-allowed'}} disabled={!allMarked} onClick={saveScore}>✓ Save my score</button>}
+        {!saved && !allMarked && <span style={{fontSize:'.8rem',color:'#6b7280'}}>Mark every question to save your score.</span>}
+        <button style={saved?RS.btnSubmit:{...RS.btnSubmit,background:'transparent',color:'#1a2e5a',border:'1.5px solid #e5e4e0'}} onClick={onRetry}>↩ Try again</button>
         <button style={{...RS.btnSubmit,background:'transparent',color:'#1a2e5a',border:'1.5px solid #e5e4e0'}} onClick={onBack}>← Choose another year</button>
         <a href="index.html" style={{...RS.btnSubmit,background:'transparent',color:'#1a2e5a',border:'1.5px solid #e5e4e0',textDecoration:'none',display:'inline-flex',alignItems:'center'}}>🏠 Home</a>
       </div>

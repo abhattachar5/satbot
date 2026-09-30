@@ -167,6 +167,7 @@ function computeTopicMastery(attempts) {
  * @returns {"improving"|"flat"|"declining"|"insufficient_data"}
  */
 function computeTrend(subjectAttempts) {
+  subjectAttempts = subjectAttempts.filter(a => a.maxScore > 0);
   if (subjectAttempts.length < 4) return 'insufficient_data';
   const pct = a => a.maxScore > 0 ? (a.score / a.maxScore) * 100 : 0;
   const avg = arr => arr.reduce((s, a) => s + pct(a), 0) / arr.length;
@@ -215,7 +216,7 @@ function evaluateAchievementRules(store, now) {
   if (!earned.has('improver')) {
     for (const subject of [...new Set(attempts.map(a => a.subject))]) {
       const sub = attempts
-        .filter(a => a.subject === subject)
+        .filter(a => a.subject === subject && a.maxScore > 0)
         .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));
       if (sub.length >= 6) {
         const pct = a => a.maxScore > 0 ? (a.score / a.maxScore) * 100 : 0;
@@ -226,6 +227,27 @@ function evaluateAchievementRules(store, now) {
   }
 
   return newlyEarned;
+}
+
+/**
+ * Reading attempts recorded before self-marking existed stored the number of
+ * questions *attempted* as the score. Those are not real scores, so strip
+ * their maxScore (every aggregation ignores maxScore 0) while keeping the
+ * attempt itself for streaks and paper counts. Idempotent; mutates in place.
+ *
+ * @param {object} store
+ * @returns {boolean} true if anything changed
+ */
+function retireLegacyReadingScores(store) {
+  let changed = false;
+  for (const a of store.attempts || []) {
+    if (a.subject === 'reading' && !a.selfMarked && a.maxScore > 0) {
+      a.maxScore = 0;
+      a.legacyUnscored = true;
+      changed = true;
+    }
+  }
+  return changed;
 }
 
 // Achievement display metadata (names, icons, descriptions) for UI use.
@@ -270,6 +292,7 @@ class ProgressStore {
         return this._store;
       }
       this._store = parsed;
+      if (retireLegacyReadingScores(parsed)) log('Retired legacy reading scores');
       log('Store loaded, attempts:', parsed.attempts.length);
       return this._store;
     } catch (e) {
@@ -334,6 +357,7 @@ class ProgressStore {
       questionResults: attempt.questionResults || [],
       retryOf:         attempt.retryOf || null
     };
+    if (attempt.selfMarked) saved.selfMarked = true;
     store.attempts.push(saved);
     this._write();
     log('recordAttempt', saved.id);
@@ -398,7 +422,7 @@ class ProgressStore {
 
   /**
    * Per-subject statistics including trend direction.
-   * @returns {Promise<Array<{ subject, attemptCount, averagePercent, trend, lastAttemptAt }>>}
+   * @returns {Promise<Array<{ subject, attemptCount, scoredCount, averagePercent, trend, lastAttemptAt }>>}
    */
   async getSubjectBreakdown() {
     const { attempts } = this._getStore();
@@ -414,6 +438,7 @@ class ProgressStore {
       return {
         subject,
         attemptCount: sub.length,
+        scoredCount:  scoreable.length,
         averagePercent,
         trend: computeTrend(sub),
         lastAttemptAt: newestFirst.length > 0 ? newestFirst[0].completedAt : null
@@ -589,6 +614,7 @@ class ProgressStore {
     }
     if (errors.length > 0) return Promise.resolve({ success: false, errors });
     this._store = JSON.parse(JSON.stringify(data));
+    retireLegacyReadingScores(this._store);
     this._write();
     log('importAll: store replaced');
     return Promise.resolve({ success: true, errors: [] });
@@ -609,7 +635,7 @@ class ProgressStore {
 
 // Attach metadata and helpers for UI and testing access.
 ProgressStore.ACHIEVEMENT_META = ACHIEVEMENT_META;
-ProgressStore._helpers         = { computeStreak, computeTopicMastery, computeTrend };
+ProgressStore._helpers         = { computeStreak, computeTopicMastery, computeTrend, retireLegacyReadingScores };
 
 // Expose globally for plain <script> usage.
 if (typeof window !== 'undefined') window.ProgressStore = ProgressStore;
