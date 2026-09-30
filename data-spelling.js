@@ -28,6 +28,31 @@ const SPELLING_SETS = [
     ]
   },
   {
+    year: "2025",
+    words: [
+      {id:1,  word:"creature",      sentence:"A strange ___ crawled out from under the rock.",                           category:"Word endings",           tip:"crea-TURE — the 'cher' sound at the end is spelt '-ture', like 'picture' and 'nature'"},
+      {id:2,  word:"happily",       sentence:"The children played ___ in the garden all afternoon.",                     category:"Adding suffixes",        tip:"happy → happily: change the 'y' to 'i' before adding '-ly'"},
+      {id:3,  word:"invasion",      sentence:"The castle walls were built to stop an ___.",                              category:"Word endings",           tip:"in-VA-sion — the 'zhun' sound is spelt '-sion', from 'invade'"},
+      {id:4,  word:"preparation",   sentence:"The ___ for the school fair took all week.",                               category:"Word endings",           tip:"prepare → prepar-ATION — drop the 'e', then add '-ation'"},
+      {id:5,  word:"dangerous",     sentence:"Swimming in the river can be ___.",                                        category:"Word endings",           tip:"danger + ous — just add '-ous' to 'danger'"},
+      {id:6,  word:"visible",       sentence:"The lighthouse was ___ from miles away.",                                  category:"Word endings",           tip:"vis-IBLE — '-ible' because 'vis' is not a whole word on its own"},
+      {id:7,  word:"wrist",         sentence:"She wore a silver bracelet on her ___.",                                   category:"Silent letters",         tip:"W-rist — silent 'w' at the start, like 'write' and 'wrong'"},
+      {id:8,  word:"guard",         sentence:"A ___ stood outside the palace gates.",                                    category:"Silent letters",         tip:"G-U-ard — the 'u' is silent: 'gu' makes a hard 'g' sound, like 'guess'"},
+      {id:9,  word:"ceiling",       sentence:"A spider was spinning a web on the ___.",                                  category:"i before e",             tip:"c-EI-ling — 'e' before 'i' after 'c', like 'receive'"},
+      {id:10, word:"mysterious",    sentence:"A ___ parcel arrived with no name on it.",                                 category:"Word endings",           tip:"myst-ER-ious — from 'mystery': change the 'y' to 'i' and add '-ous'"},
+      {id:11, word:"disappear",     sentence:"The magician made the rabbit ___.",                                        category:"Prefixes",               tip:"dis + appear — one 's' from 'dis', two p's from 'appear'"},
+      {id:12, word:"preferred",     sentence:"She ___ the blue coat to the red one.",                                    category:"Adding suffixes",        tip:"pre-FER-red — the stress is on 'fer', so double the 'r' before '-ed'"},
+      {id:13, word:"courageous",    sentence:"The ___ firefighter rescued the kitten.",                                  category:"Word endings",           tip:"courage + ous — keep the 'e' so the 'g' stays soft: courag-E-ous"},
+      {id:14, word:"machine",       sentence:"The washing ___ made a loud rumbling noise.",                              category:"Unusual spellings",      tip:"ma-CHINE — here 'ch' makes a 'sh' sound, as in 'chef'"},
+      {id:15, word:"technique",     sentence:"Our coach showed us a new ___ for catching the ball.",                     category:"Unusual spellings",      tip:"tech-NIQUE — 'que' at the end makes a 'k' sound"},
+      {id:16, word:"medicine",      sentence:"The doctor gave me some ___ for my cough.",                                category:"Hidden letters",         tip:"MED-i-cine — don't forget the middle 'i': med-I-cine"},
+      {id:17, word:"February",      sentence:"My birthday is on the fourth of ___.",                                     category:"Hidden letters",         tip:"Feb-RU-ary — say the hidden 'r': Feb-ru-ary, and start with a capital letter"},
+      {id:18, word:"island",        sentence:"We took a boat across to the small ___.",                                  category:"Silent letters",         tip:"IS-land — silent 's': it is an 'is' + 'land'"},
+      {id:19, word:"attached",      sentence:"A label was ___ to the handle of the suitcase.",                           category:"Double letters",         tip:"at-TACHED — double 't', and no 't' before 'ch': a-TT-ached"},
+      {id:20, word:"bargain",       sentence:"The coat was a real ___ in the sale.",                                     category:"Word endings",           tip:"bar-GAIN — ends in '-gain', as in 'gain'"}
+    ]
+  },
+  {
     year: "2024",
     words: [
       {id:1,  word:"necessary",     sentence:"It is ___ to have a good breakfast before school.",                         category:"Single/double letters", tip:"One collar (c), two socks (ss): ne-C-e-SS-ary"},
