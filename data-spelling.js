@@ -3,6 +3,31 @@
 
 const SPELLING_SETS = [
   {
+    year: "2026",
+    words: [
+      {id:1,  word:"official",      sentence:"The ___ results will be announced tomorrow morning.",                      category:"Word endings",           tip:"of-FI-cial — '-cial' ending after a vowel, like 'special' and 'social'"},
+      {id:2,  word:"collision",     sentence:"The two trains narrowly avoided a ___.",                                    category:"Word endings",           tip:"col-LI-sion — double l, and '-sion' because it comes from 'collide'"},
+      {id:3,  word:"measure",       sentence:"Use a ruler to ___ the length of the table.",                              category:"Word endings",           tip:"mea-SURE — the 'zhuh' sound is spelt '-sure', like 'treasure' and 'leisure'"},
+      {id:4,  word:"sensible",      sentence:"Wearing a helmet when you cycle is a ___ idea.",                           category:"Word endings",           tip:"sens-IBLE — '-ible' because 'sens' is not a whole word on its own"},
+      {id:5,  word:"gently",        sentence:"She ___ lifted the baby bird back into its nest.",                         category:"Adding suffixes",        tip:"gentle → gently: for words ending in '-le', swap the 'e' for 'y'"},
+      {id:6,  word:"knuckle",       sentence:"He grazed his ___ on the rough brick wall.",                               category:"Silent letters",         tip:"K-nuckle — silent 'k' at the start, like 'knee' and 'knock'"},
+      {id:7,  word:"especially",    sentence:"I love all fruit, ___ strawberries.",                                      category:"Adding suffixes",        tip:"e-SPECIAL-ly — it's 'special' with 'e' in front and '-ly' on the end: double l"},
+      {id:8,  word:"environment",   sentence:"We must all work together to protect the ___.",                            category:"Hidden letters",         tip:"en-VIRON-ment — don't forget the 'n' before '-ment': enviro-N-ment"},
+      {id:9,  word:"sincerely",     sentence:"She ended her letter with 'Yours ___'.",                                   category:"Adding suffixes",        tip:"sincere + ly — keep the 'e': sincer-E-ly"},
+      {id:10, word:"recognise",     sentence:"I didn't ___ my cousin with her new haircut.",                             category:"Hidden letters",         tip:"re-COG-nise — say the hidden 'g' clearly: rec-OG-nise"},
+      {id:11, word:"equipment",     sentence:"The PE ___ is kept in the store cupboard.",                                category:"Common misspelling",     tip:"e-QUIP-ment — 'equip' + 'ment'; there is no 't' after 'equip'"},
+      {id:12, word:"opportunity",   sentence:"The school trip was a great ___ to learn about history.",                  category:"Double letters",         tip:"op-POR-tunity — double p: o-PP-ortunity"},
+      {id:13, word:"soldier",       sentence:"The ___ marched proudly in the parade.",                                   category:"Common misspelling",     tip:"sol-DIER — the 'j' sound is spelt 'di': sol-DI-er"},
+      {id:14, word:"yacht",         sentence:"A white ___ sailed slowly across the bay.",                                category:"Silent letters",         tip:"YA-CH-T — a tricky word from Dutch; say 'yak-t' in your head"},
+      {id:15, word:"pronunciation", sentence:"Our teacher helped us with the ___ of the French words.",                  category:"Common misspelling",     tip:"pro-NUN-ciation — 'pronounce' loses its 'o': pro-NUN-ciation, not 'pronounciation'"},
+      {id:16, word:"ambitious",     sentence:"The team had an ___ plan to win the league.",                              category:"Word endings",           tip:"am-BI-tious — '-tious' because it comes from 'ambition'"},
+      {id:17, word:"essential",     sentence:"Water is ___ for all living things.",                                      category:"Word endings",           tip:"es-SEN-tial — double s, then '-tial' after a consonant, like 'potential'"},
+      {id:18, word:"criticise",     sentence:"It is unkind to ___ someone's drawing.",                                   category:"Word endings",           tip:"crit-I-cise — built on 'critic' + '-ise'"},
+      {id:19, word:"conscious",     sentence:"The patient was ___ soon after the operation.",                            category:"Silent letters",         tip:"con-SCIOUS — 'sc' makes a 'sh' sound; think 'con' + 'science' + 'ous'"},
+      {id:20, word:"community",     sentence:"Our local ___ raised money to repair the park.",                           category:"Double letters",         tip:"com-MUN-ity — double m: co-MM-unity"}
+    ]
+  },
+  {
     year: "2024",
     words: [
       {id:1,  word:"necessary",     sentence:"It is ___ to have a good breakfast before school.",                         category:"Single/double letters", tip:"One collar (c), two socks (ss): ne-C-e-SS-ary"},

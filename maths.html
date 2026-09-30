@@ -34,7 +34,7 @@
     {
       "@type": "Question",
       "name": "How many Maths SATS practice papers are available?",
-      "acceptedAnswer": { "@type": "Answer", "text": "SATBot offers 6 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Paper 2 Reasoning paper, giving 240 practice questions in total." }
+      "acceptedAnswer": { "@type": "Answer", "text": "SATBot offers 7 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Reasoning paper, and the 2026 set follows the full 2026 format with both Reasoning papers — 322 practice questions in total." }
     }
   ]
 }
@@ -105,6 +105,8 @@ function normalizeMathsAnswer(str) {
   s = s.replace(/−/g, '-');
   // Strip currency symbols
   s = s.replace(/£/g, '');
+  // Strip brackets so coordinates "(3, 5)" and "3, 5" both match
+  s = s.replace(/[()]/g, '');
   // Remove thousands-separator commas (420,000 → 420000; 1,234,567 → 1234567)
   // Matches the full thousands-formatted number and strips internal commas only
   s = s.replace(/\b\d{1,3}(?:,\d{3})+\b/g, m => m.replace(/,/g, ''));
@@ -128,14 +130,22 @@ function normalizeMathsAnswer(str) {
 }
 
 // Order-independent match: "38, 62" accepts "62 and 38" etc.
-function answersMatch(ua, ca) {
+// Pass ordered=true for questions where order matters (ordering, coordinates).
+function answersMatch(ua, ca, ordered) {
   if (ua === ca) return true;
+  if (ordered) return false;
   // If either side has comma-separated parts, sort both and compare
   const split = s => s.split(', ').map(p => p.trim()).filter(Boolean).sort();
   const uaParts = split(ua);
   const caParts = split(ca);
   return uaParts.length > 1 && uaParts.length === caParts.length &&
          uaParts.every((p, i) => p === caParts[i]);
+}
+
+// A question is correct if the answer matches q.answer or any q.accept alternative.
+function isCorrect(q, raw) {
+  const ua = normalizeMathsAnswer(raw || '');
+  return [q.answer, ...(q.accept || [])].some(ca => answersMatch(ua, normalizeMathsAnswer(ca), q.ordered));
 }
 
 const TWEAKS = { showDisclaimer: true, disclaimerStyle: "banner", accentColor: "#f59e0b", showTipBox: true };
@@ -173,18 +183,15 @@ function Results({ paper, year, answers, onRetry, onBack }) {
   const qs = paper.questions;
   const totalMarks = qs.reduce((a,q)=>a+q.mark,0);
   let earned = 0;
-  qs.forEach(q => {
-    const ua = normalizeMathsAnswer(answers[q.id]||'');
-    const ca = normalizeMathsAnswer(q.answer);
-    if (answersMatch(ua,ca)) earned+=q.mark;
-  });
+  qs.forEach(q => { if (isCorrect(q, answers[q.id])) earned+=q.mark; });
   const pct = Math.round((earned/totalMarks)*100);
   const barColor = pct>=75?'#059669':pct>=50?'#f59e0b':'#dc2626';
   const band = pct>=85?'Excellent!':pct>=70?'Good — at expected standard':pct>=50?'Getting there — keep practising':'Keep going — read the explanations below';
 
   useEffect(() => {
     const store = new ProgressStore();
-    const slug = paper.title.toLowerCase().includes('arithmetic') ? 'arith' : 'reason';
+    const title = paper.title.toLowerCase();
+    const slug = title.includes('arithmetic') ? 'arith' : title.includes('paper 3') ? 'reason3' : 'reason';
     store.recordAttempt({
       paperCode: 'maths-' + slug + '-' + (year || 'unknown'),
       subject: 'maths',
@@ -194,7 +201,7 @@ function Results({ paper, year, answers, onRetry, onBack }) {
       questionResults: qs.map(q => ({
         qId: 'maths-q' + q.id,
         topic: q.topic || null,
-        correct: answersMatch(normalizeMathsAnswer(answers[q.id]||''), normalizeMathsAnswer(q.answer))
+        correct: isCorrect(q, answers[q.id])
       }))
     }).then(() => store.evaluateAchievements());
   }, []);
@@ -211,8 +218,7 @@ function Results({ paper, year, answers, onRetry, onBack }) {
       </div>
       <div style={{fontSize:'1.1rem',fontWeight:700,color:'#1a2e5a',marginBottom:'1rem'}}>Question review</div>
       {qs.map(q => {
-        const ua = normalizeMathsAnswer(answers[q.id]||'');
-        const ok = answersMatch(ua, normalizeMathsAnswer(q.answer));
+        const ok = isCorrect(q, answers[q.id]);
         return (
           <div key={q.id} style={S.rcCard(ok)}>
             <div style={{fontSize:'.72rem',fontWeight:600,color:'#6b7280',marginBottom:'.3rem'}}>Q{q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
@@ -356,7 +362,7 @@ function StartScreen({ onStart, tweaks }) {
         <div style={{marginBottom:'2rem'}}>
           <div style={{fontSize:'.75rem',fontWeight:600,color:'#6b7280',letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'.5rem'}}>Mathematics</div>
           <h1 style={{fontSize:'2rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.03em',marginBottom:'.5rem'}}>Year 6 Maths SATS Practice Papers</h1>
-          <p style={{color:'#6b7280',lineHeight:1.6}}>Choose a year and paper. Each set has Paper 1 (Arithmetic) and Paper 2 (Reasoning) written <strong style={{color:'#1a2e5a'}}>in the style of</strong> KS2 SATs papers — original questions, not official past papers.</p>
+          <p style={{color:'#6b7280',lineHeight:1.6}}>Choose a year and paper. Each set has Paper 1 (Arithmetic) and a Reasoning paper — the 2026 set has both Reasoning papers, just like the real test — written <strong style={{color:'#1a2e5a'}}>in the style of</strong> KS2 SATs papers — original questions, not official past papers.</p>
         </div>
 
         <div style={{marginBottom:'1.5rem'}}>
@@ -372,7 +378,7 @@ function StartScreen({ onStart, tweaks }) {
           const set = MATHS_SETS.find(s=>s.year===selectedYear);
           return (
             <div>
-              {[set.paper1, set.paper2].map((p,i) => (
+              {[set.paper1, set.paper2, set.paper3].filter(Boolean).map((p,i) => (
                 <div key={i} style={{background:'#fff',border:'1.5px solid #e5e4e0',borderRadius:'12px',padding:'1.5rem',marginBottom:'1rem',display:'flex',alignItems:'center',gap:'1.25rem'}}>
                   <div style={{width:'48px',height:'48px',background:'#eff6ff',borderRadius:'12px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.4rem',flexShrink:0}}>📐</div>
                   <div style={{flex:1}}>
@@ -453,7 +459,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
       </div>
       <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
         <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">How many Maths SATS practice papers are available here?</h3>
-        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">SATBot offers 6 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Paper 2 Reasoning paper — 240 KS2 Maths practice questions in total, all free.</p>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">SATBot offers 7 complete Year 6 Maths SATS practice sets. Each set includes a Paper 1 Arithmetic and a Reasoning paper, and the 2026 set follows the full 2026 format with both Reasoning papers — 322 KS2 Maths practice questions in total, all free.</p>
       </div>
     </div>
     <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e4e0;font-size:.9rem;color:#6b7280;">
