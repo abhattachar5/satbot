@@ -426,7 +426,7 @@ class ProgressStore {
    */
   async getSubjectBreakdown() {
     const { attempts } = this._getStore();
-    return Promise.resolve(['maths', 'reading', 'spag'].map(subject => {
+    return Promise.resolve(['maths', 'spag', 'reading'].map(subject => {
       const sub = attempts
         .filter(a => a.subject === subject)
         .sort((a, b) => new Date(a.completedAt) - new Date(b.completedAt));

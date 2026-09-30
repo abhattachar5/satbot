@@ -665,8 +665,8 @@ function renderEmptyState() {
     '  <p>Pick a subject below, complete a paper, and your scores, charts and badges will appear right here.</p>',
     '  <div class="empty-cta-row">',
     '    <a href="maths.html"   class="btn-primary">🔢 Practise Maths</a>',
-    '    <a href="reading.html" class="btn-primary" style="background:var(--green);color:#fff">📖 Practise Reading</a>',
     '    <a href="spag.html"    class="btn-primary" style="background:var(--purple);color:#fff">✏️ Practise SPaG</a>',
+    '    <a href="reading.html" class="btn-primary" style="background:var(--green);color:#fff">📖 Practise Reading</a>',
     '  </div>',
     '  <div class="empty-preview" role="complementary" aria-label="What you\'ll get">',
     '    <h3>What you\'ll see here</h3>',
@@ -767,7 +767,7 @@ function buildChart(timeline) {
   }
 
   var colors = { maths:'#2563eb', reading:'#059669', spag:'#7c3aed' };
-  var subjects = ['maths','reading','spag'];
+  var subjects = ['maths','spag','reading'];
   var allLabels = [];
   var seen = {};
   timeline.forEach(function(p) {
@@ -967,7 +967,7 @@ function renderGoals(goalProgress, achievements) {
     '<div class="goal-form-card">',
     (goalProgress.length === 0 ? '  <p>Set a target to work towards &mdash; it helps!</p>' : '  <p>Add another goal</p>'),
     '  <form class="goal-form" id="goal-form">',
-    '    <select name="subject" required aria-label="Subject"><option value="maths">Maths</option><option value="reading">Reading</option><option value="spag">SPaG</option></select>',
+    '    <select name="subject" required aria-label="Subject"><option value="maths">Maths</option><option value="spag">SPaG</option><option value="reading">Reading</option></select>',
     '    <input type="number" name="targetPercent" min="1" max="100" value="80" required aria-label="Target %">',
     '    <input type="date" name="deadline" required aria-label="Deadline">',
     '    <button type="submit" class="btn-card-primary">' + (goalProgress.length === 0 ? 'Set goal' : '+ Add goal') + '</button>',
