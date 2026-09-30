@@ -34,7 +34,7 @@
     {
       "@type": "Question",
       "name": "How many Reading SATS practice papers are available?",
-      "acceptedAnswer": { "@type": "Answer", "text": "SATBot offers 3 complete Year 6 Reading SATS practice sets, each with two original texts (fiction and non-fiction) and 15 comprehension questions. The texts stay visible on screen while you answer, just like the real exam booklet." }
+      "acceptedAnswer": { "@type": "Answer", "text": "SATBot offers 4 complete Year 6 Reading SATS practice sets with original fiction and non-fiction texts, including a full 2026-format paper with three texts and 50 marks. The texts stay visible on screen while you answer, just like the real exam booklet." }
     }
   ]
 }
@@ -91,6 +91,9 @@ const RS = {
   textLabel: { fontSize:'.7rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:'#059669', marginBottom:'5px' },
   textTitle: { fontSize:'1.15rem', fontWeight:800, fontFamily:"'DM Sans',sans-serif", color:'#1a2e5a', marginBottom:'14px' },
   para: { marginBottom:'1em' },
+  intro: { fontStyle:'italic', color:'#4b5563', marginBottom:'1.25em' },
+  subhead: { fontFamily:"'DM Sans',sans-serif", fontSize:'1rem', fontWeight:800, color:'#1a2e5a', margin:'1.5em 0 .5em' },
+  noticeBox: { border:'2px dashed #059669', borderRadius:'8px', padding:'.85rem 1rem', margin:'0 0 1em', fontFamily:"'DM Sans',sans-serif", fontWeight:600, textAlign:'center', whiteSpace:'pre-line' },
   qHeader: { padding:'1rem 1.5rem', borderBottom:'1.5px solid #e5e4e0', position:'sticky', top:0, background:'#fafaf8', zIndex:10, display:'flex', alignItems:'center', gap:'1rem', flexWrap:'wrap' },
   timerBox: (warn) => ({ display:'flex', alignItems:'center', gap:'.4rem', background:warn?'#fee2e2':'#f3f2ef', borderRadius:'8px', padding:'.35rem .85rem', fontSize:'.875rem', fontWeight:600, color:warn?'#dc2626':'#1c1c1e' }),
   progressBar: { height:'3px', background:'#e5e4e0' },
@@ -99,7 +102,7 @@ const RS = {
   sectionLbl: { fontSize:'.7rem', fontWeight:700, letterSpacing:'.1em', textTransform:'uppercase', color:'#6b7280', padding:'1.25rem 0 .5rem', borderBottom:'1px solid #e5e4e0', marginBottom:'.85rem', cursor:'pointer' },
   qCard: { background:'#fff', border:'1.5px solid #e5e4e0', borderRadius:'10px', padding:'1.25rem', marginBottom:'.85rem' },
   qNum: { fontSize:'.72rem', fontWeight:600, color:'#6b7280', letterSpacing:'.08em', textTransform:'uppercase', marginBottom:'.35rem' },
-  qText: { fontSize:'.95rem', fontWeight:500, color:'#1c1c1e', lineHeight:1.55, marginBottom:'.85rem' },
+  qText: { fontSize:'.95rem', fontWeight:500, color:'#1c1c1e', lineHeight:1.55, marginBottom:'.85rem', whiteSpace:'pre-line' },
   textarea: { width:'100%', fontSize:'.875rem', padding:'.6rem .85rem', border:'1.5px solid #e5e4e0', borderRadius:'8px', fontFamily:"'DM Sans',sans-serif", resize:'vertical', minHeight:'80px', lineHeight:1.5 },
   shortInput: { width:'100%', fontSize:'.875rem', padding:'.55rem .85rem', border:'1.5px solid #e5e4e0', borderRadius:'8px', fontFamily:"'DM Sans',sans-serif" },
   markChip: { fontSize:'.72rem', color:'#6b7280', marginTop:'.4rem' },
@@ -110,6 +113,22 @@ const RS = {
 function Timer({ s }) {
   const m=Math.floor(s/60); const sec=s%60; const warn=s<300;
   return <div style={RS.timerBox(warn)}>{warn?'⚠ ':''}{String(m).padStart(2,'0')}:{String(sec).padStart(2,'0')}</div>;
+}
+
+// Question sections in text order, then any questions on more than one text (text 0).
+function textSections(set) {
+  return [...set.texts.map(t=>t.id), 0].filter(n => set.questions.some(q=>q.text===n));
+}
+function sectionLabel(set, textNum) {
+  const t = set.texts.find(x=>x.id===textNum);
+  return textNum===0 ? 'Both Texts' : `Text ${textNum}${t?' — '+t.title:''}`;
+}
+
+// Body paragraphs: '## ' starts a subheading, '> ' starts a boxed notice.
+function Paragraph({ p }) {
+  if (p.startsWith('## ')) return <h3 style={RS.subhead}>{p.slice(3)}</h3>;
+  if (p.startsWith('> ')) return <div style={RS.noticeBox}>{p.slice(2)}</div>;
+  return <p style={RS.para}>{p}</p>;
 }
 
 function TextPanel({ set, activeText, setActiveText }) {
@@ -125,7 +144,8 @@ function TextPanel({ set, activeText, setActiveText }) {
       <div style={RS.textBody}>
         <div style={RS.textLabel}>{t.label}</div>
         <div style={RS.textTitle}>{t.title}</div>
-        {t.body.split('\n\n').map((p,i)=><p key={i} style={RS.para}>{p}</p>)}
+        {t.intro && <p style={RS.intro}>{t.intro}</p>}
+        {t.body.split('\n\n').map((p,i)=><Paragraph key={i} p={p}/>)}
       </div>
     </div>
   );
@@ -173,7 +193,7 @@ function Results({ set, answers, onRetry, onBack }) {
       completedAt: new Date().toISOString(),
       questionResults: qs.map(q => ({
         qId: 'reading-q' + q.id,
-        topic: null,
+        topic: q.topic || null,
         correct: marks[q.id] === q.mark
       }))
     }).then(() => store.evaluateAchievements());
@@ -209,9 +229,9 @@ function Results({ set, answers, onRetry, onBack }) {
       <div style={{fontSize:'.85rem',color:'#6b7280',marginBottom:'1.5rem',lineHeight:1.55,background:'#f3f2ef',padding:'1rem',borderRadius:'8px'}}>
         ℹ️ Reading comprehension allows a range of valid answers. If you made a similar point to the model answer, with evidence where the question asks for it, give yourself the marks!
       </div>
-      {[1,2,0].map(textNum => {
+      {textSections(set).map(textNum => {
         const filtered = qs.filter(q=>q.text===textNum);
-        const sLabel = textNum===1?`Text 1 — ${set.texts[0].title}`:textNum===2?`Text 2 — ${set.texts[1].title}`:'Both Texts';
+        const sLabel = sectionLabel(set, textNum);
         return (
           <div key={textNum}>
             <div style={{fontSize:'.7rem',fontWeight:700,letterSpacing:'.1em',textTransform:'uppercase',color:'#6b7280',marginTop:'1.5rem',marginBottom:'.75rem'}}>{sLabel}</div>
@@ -220,7 +240,7 @@ function Results({ set, answers, onRetry, onBack }) {
               return (
                 <div key={q.id} style={{background:bg,border:`1.5px solid ${border}`,borderRadius:'10px',padding:'1.25rem',marginBottom:'.75rem'}}>
                   <div style={{fontSize:'.72rem',fontWeight:600,color:'#6b7280',marginBottom:'.3rem'}}>Q{q.id} · {q.mark} mark{q.mark>1?'s':''}</div>
-                  <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.4rem',lineHeight:1.5}}>{q.q}</div>
+                  <div style={{fontSize:'.9rem',fontWeight:500,marginBottom:'.4rem',lineHeight:1.5,whiteSpace:'pre-line'}}>{q.q}</div>
                   <div style={{fontSize:'.82rem',fontWeight:600,color:'#374151',marginBottom:'.2rem'}}>Your answer: <span style={{fontWeight:400}}>{answers[q.id]||'(no answer)'}</span></div>
                   <div style={{fontSize:'.82rem',fontWeight:600,color:'#059669',marginBottom:'.3rem'}}>Model answer: <span style={{fontWeight:400}}>{q.answer}</span></div>
                   <div style={{fontSize:'.82rem',color:'#374151',lineHeight:1.6,borderTop:'1px solid rgba(0,0,0,.07)',paddingTop:'.4rem',marginTop:'.3rem'}}>💡 {q.explanation}</div>
@@ -273,10 +293,9 @@ function Paper({ set, onSubmit }) {
           </div>
           <div style={RS.progressBar}><div style={RS.progressFill(pct)}></div></div>
           <div style={RS.qPad}>
-            {[1,2,0].map(textNum=>{
+            {textSections(set).map(textNum=>{
               const filtered=set.questions.filter(q=>q.text===textNum);
-              const t=set.texts.find(x=>x.id===textNum);
-              const sLabel=textNum===0?'Both Texts':`Text ${textNum}${t?' — '+t.title:''}`;
+              const sLabel=sectionLabel(set, textNum);
               return (
                 <div key={textNum}>
                   <div style={RS.sectionLbl} onClick={()=>textNum>0&&setActiveText(textNum)}>{sLabel}</div>
@@ -315,7 +334,7 @@ function StartScreen({ onStart }) {
       <div style={{marginBottom:'2rem'}}>
         <div style={{fontSize:'.75rem',fontWeight:600,color:'#6b7280',letterSpacing:'.1em',textTransform:'uppercase',marginBottom:'.5rem'}}>English</div>
         <h1 style={{fontSize:'2rem',fontWeight:800,color:'#1a2e5a',letterSpacing:'-.03em',marginBottom:'.5rem'}}>Year 6 English SATS Practice Papers</h1>
-        <p style={{color:'#6b7280',lineHeight:1.6}}>Choose a year. Each paper has two original texts (fiction + non-fiction) and 15 comprehension questions. The texts stay visible on the left while you answer.</p>
+        <p style={{color:'#6b7280',lineHeight:1.6}}>Choose a year. Each paper has original fiction and non-fiction texts with comprehension questions — the 2026 paper has three texts and 50 marks, just like the real test. The texts stay visible on the left while you answer.</p>
       </div>
       <div style={{marginBottom:'1.5rem'}}>
         <div style={{fontSize:'.8rem',fontWeight:600,color:'#6b7280',marginBottom:'.75rem',textTransform:'uppercase',letterSpacing:'.07em'}}>Select year</div>
@@ -330,7 +349,7 @@ function StartScreen({ onStart }) {
         return (
           <div style={{background:'#fff',border:'1.5px solid #e5e4e0',borderRadius:'12px',padding:'1.5rem',marginBottom:'1rem'}}>
             <div style={{fontWeight:700,color:'#1a2e5a',marginBottom:'.35rem'}}>Reading Paper — {selectedYear}</div>
-            <div style={{fontSize:'.85rem',color:'#6b7280',marginBottom:'1rem'}}>2 texts · {set.questions.length} questions · 60 minutes · {set.questions.reduce((a,q)=>a+q.mark,0)} marks</div>
+            <div style={{fontSize:'.85rem',color:'#6b7280',marginBottom:'1rem'}}>{set.texts.length} texts · {set.questions.length} questions · 60 minutes · {set.questions.reduce((a,q)=>a+q.mark,0)} marks</div>
             <div style={{display:'flex',gap:'.5rem',flexWrap:'wrap',marginBottom:'1.25rem'}}>
               {set.texts.map(t=>(
                 <span key={t.id} style={{fontSize:'.75rem',padding:'.2rem .65rem',borderRadius:'100px',background:'#d1fae5',color:'#059669',fontWeight:500}}>Text {t.id}: {t.title}</span>
@@ -380,7 +399,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
       </div>
       <div style="padding:1.25rem 1.5rem;background:#fff;border:1.5px solid #e5e4e0;border-radius:12px;">
         <h3 style="font-size:.95rem;font-weight:700;color:#1a2e5a;margin-bottom:.4rem;">How many Reading SATS practice papers are available here?</h3>
-        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">SATBot offers 3 complete Year 6 Reading SATS practice sets, each with two original texts (fiction and non-fiction) and 15 comprehension questions — 45 KS2 reading questions in total, all free.</p>
+        <p style="font-size:.9rem;color:#6b7280;line-height:1.6;margin:0;">SATBot offers 4 complete Year 6 Reading SATS practice sets with original fiction and non-fiction texts — including a full 2026-format paper with three texts — 84 KS2 reading questions in total, all free.</p>
       </div>
     </div>
     <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid #e5e4e0;font-size:.9rem;color:#6b7280;">
